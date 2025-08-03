@@ -4,27 +4,26 @@
 
 @ECHO off
 
-SET UserDownloads=%USERPROFILE%\Downloads
+SET "UserDownloads=%USERPROFILE%\Downloads"
+SET "RepoName=d326-advanced-data-management"
+SET "RepoUrl=https://github.com/fjbo-net/%RepoName%"
+SET "RepoGitUrl=%RepoUrl%.git"
+SET "Head=11-add-dev-setup"
+SET "DevScriptsBaseUrl=https://raw.githubusercontent.com/fjbo-net/%RepoName%/refs/heads/%Head%/scripts/dev"
+SET "DevDirectory=%USERPROFILE%\Source"
+SET "LocalRepo=%DevDirectory%\%RepoName%"
 
-SET RepoName=d326-advanced-data-management
-SET RepoUrl=https://github.com/fjbo-net/%RepoName%
-SET RepoGitUrl=%RepoUrl%.git
-SET Head=11-add-dev-setup
-SET DevScriptsBaseUrl=https://raw.githubusercontent.com/fjbo-net/%RepoName%/refs/heads/%Head%/scripts/dev
-SET DevDirectory=%USERPROFILE%\Source
-SET LocalRepo=%DevDirectory%\%RepoName%
+SET "VsCodeInstallScriptName=install-vscode.bat"
+SET "VsCodeInstallScriptUrl=%DevScriptsBaseUrl%/%VsCodeInstallScriptName%"
+SET "VsCodeLocalInstallScript=%UserDownloads%\%VsCodeInstallScriptName%"
 
-SET VsCodeInstallScriptName=install-vscode.bat
-SET VsCodeInstallScriptUrl=%DevScriptsBaseUrl%/%VsCodeInstallScriptName%
-SET VsCodeLocalInstallScript=%UserDownloads%\%VsCodeInstallScriptName%
+SET "GitInstallerScriptName=install-git.bat"
+SET "GitInstallerScriptUrl=%DevScriptsBaseUrl%/%GitInstallerScriptName%"
+SET "GitLocalInstallerScript=%UserDownloads%\%GitInstallerScriptName%"
 
-SET GitInstallerScriptName=install-git.bat
-SET GitInstallerScriptUrl=%DevScriptsBaseUrl%/%GitInstallerScriptName%
-SET GitLocalInstallerScript=%UserDownloads%\%GitInstallerScriptName%
-
-SET GitDirectory=%ProgramFiles%\Git
-SET GitBinDirectory=%GitDirectory%\bin
-SET Git=%GitBinDirectory%\git.exe
+SET "GitDirectory=%ProgramFiles%\Git"
+SET "GitBinDirectory=%GitDirectory%\bin"
+SET "Git=%GitBinDirectory%\git.exe"
 
 
 :: Download Visual Studio Code install script

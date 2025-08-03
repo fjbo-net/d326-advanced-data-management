@@ -65,7 +65,26 @@ ECHO SUCCESS: VS Code installer script downloaded
 :: Download Git for Windows install script
 ECHO.
 ECHO [3/7] Downloading Git installer script...
-CURL -L -o %GitLocalInstallerScript% %GitInstallerScriptUrl%
+CURL -L -f -s -o "%GitLocalInstallerScript%" "%GitInstallerScriptUrl%"
+IF ERRORLEVEL 1 (
+	ECHO ERROR: Failed to download Git installer script.
+	GOTO :CLEANUP_ERROR
+)
+
+:: Verify Git script was downloaded
+IF NOT EXIST "%GitLocalInstallerScript%" (
+	ECHO ERROR: Git installer script was not downloaded.
+	GOTO :CLEANUP_ERROR
+)
+
+:: Verify Git script has content
+FOR %%A IN ("%GitLocalInstallerScript%") DO (
+	IF %%~zA LSS 10 (
+		ECHO ERROR: Downloaded Git script appears to be empty or corrupted.
+		GOTO :CLEANUP_ERROR
+	)
+)
+ECHO SUCCESS: Git installer script downloaded
 
 
 :: Run Visual Studio Code install script

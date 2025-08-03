@@ -1,0 +1,12 @@
+# Build
+build/
+dist/
+
+# Temporary Files
+.tmp/
+temp/
+tmp/
+.tmp
+
+# Visual Studio
+.vs/

@@ -13,3 +13,8 @@ To configure a provisioned lab:
 1. Install Visual Studio Code
 0. Install Git for Windows
 0. Clone the repository
+
+Or use the following command to setup the provisioned lab:
+``` batch
+CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/11-add-dev-setup/scripts/dev/remote-setup.bat && remote-setup.bat
+```

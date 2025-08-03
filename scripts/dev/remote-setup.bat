@@ -27,19 +27,36 @@ SET "Git=%GitBinDirectory%\git.exe"
 
 
 :: Download Visual Studio Code install script
+ECHO.
+ECHO [1/6] Downloading VS Code installer script...
 CURL -L -o %VsCodeLocalInstallScript% %VsCodeInstallScriptUrl%
 
+
 :: Download Git for Windows install script
+ECHO.
+ECHO [2/6] Downloading Git installer script...
 CURL -L -o %GitLocalInstallerScript% %GitInstallerScriptUrl%
 
 
 :: Run Visual Studio Code install script
+ECHO.
+ECHO [3/6] Installing VS Code...
 "%VsCodeLocalInstallScript%"
 
+
 :: Run Git for Windows install script
+ECHO.
+ECHO [4/6] Installing Git...
 "%GitLocalInstallerScript%"
 
-:: Clone Repository
+
+:: Clone repository
+ECHO.
+ECHO [5/6] Cloning repository...
 "%Git%" clone %RepoGitUrl% %LocalRepo%
 
+
+:: Open repository in Visual Studio Code
+ECHO.
+ECHO [6/6] Opening repository in VS Code...
 CODE %LocalRepo%

@@ -71,3 +71,32 @@ ECHO [6/7] Cloning repository...
 ECHO.
 ECHO [7/7] Opening repository in VS Code...
 CODE %LocalRepo%
+
+
+:: Success cleanup
+ECHO.
+ECHO DONE: Setup completed successfully!
+ECHO Repository location: %LocalRepo%
+ECHO.
+
+GOTO :CLEANUP_SUCCESS
+
+:CLEANUP_ERROR
+ECHO.
+ECHO ERROR: Setup failed!
+ECHO.
+
+:CLEANUP_SUCCESS
+:: Clean up temporary files
+IF EXIST "%VsCodeLocalInstallScript%" (
+	DEL /Q "%VsCodeLocalInstallScript%" >nul 2>&1
+)
+IF EXIST "%GitLocalInstallerScript%" (
+	DEL /Q "%GitLocalInstallerScript%" >nul 2>&1
+)
+
+IF DEFINED CLEANUP_ERROR (
+	EXIT /B 1
+) ELSE (
+	EXIT /B 0
+)

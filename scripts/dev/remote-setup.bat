@@ -37,10 +37,29 @@ IF ERRORLEVEL 1 (
 ECHO SUCCESS: curl is available
 
 
-:: Download Visual Studio Code install script
+:: Download Visual Studio Code installer script
 ECHO.
 ECHO [2/7] Downloading VS Code installer script...
-CURL -L -o %VsCodeLocalInstallScript% %VsCodeInstallScriptUrl%
+CURL -L -f -s -o "%VsCodeLocalInstallScript%" "%VsCodeInstallScriptUrl%"
+IF ERRORLEVEL 1 (
+	ECHO ERROR: Failed to download VS Code installer script.
+	EXIT /B 1
+)
+
+:: Verify Visual Studio Code script was downloaded
+IF NOT EXIST "%VsCodeLocalInstallScript%" (
+	ECHO ERROR: VS Code installer script was not downloaded.
+	EXIT /B 1
+)
+
+:: Verify Visual Studio Code has content
+FOR %%A IN ("%VsCodeLocalInstallScript%") DO (
+	IF %%~zA LSS 10 (
+		ECHO ERROR: Downloaded VS Code script appears to be empty or corrupted.
+		EXIT /B 1
+	)
+)
+ECHO SUCCESS: VS Code installer script downloaded
 
 
 :: Download Git for Windows install script

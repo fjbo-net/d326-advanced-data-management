@@ -87,10 +87,15 @@ FOR %%A IN ("%GitLocalInstallerScript%") DO (
 ECHO SUCCESS: Git installer script downloaded
 
 
-:: Run Visual Studio Code install script
+:: Run Visual Studio Code installer script
 ECHO.
 ECHO [4/7] Installing VS Code...
-"%VsCodeLocalInstallScript%"
+START /WAIT /B CMD /C ""%VsCodeLocalInstallScript%" >nul 2>&1"
+IF ERRORLEVEL 1 (
+	ECHO WARNING: VS Code installation may have failed.
+) ELSE (
+	ECHO SUCCESS: VS Code installation completed
+)
 
 
 :: Run Git for Windows install script

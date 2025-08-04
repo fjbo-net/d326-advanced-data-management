@@ -139,7 +139,13 @@ ECHO SUCCESS: Repository cloned successfully
 :: Open repository in Visual Studio Code
 ECHO.
 ECHO [7/7] Opening repository in VS Code...
-CODE %LocalRepo%
+START "" CODE "%LocalRepo%" >nul 2>&1
+IF ERRORLEVEL 1 (
+	ECHO WARNING: Could not automatically open VS Code
+	ECHO You can manually open: %LocalRepo%
+) ELSE (
+	ECHO SUCCESS: Repository opened in VS Code
+)
 
 
 :: Success cleanup

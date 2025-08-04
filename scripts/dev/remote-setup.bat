@@ -98,10 +98,15 @@ IF ERRORLEVEL 1 (
 )
 
 
-:: Run Git for Windows install script
+:: Run Git for Windows installer script
 ECHO.
 ECHO [5/7] Installing Git...
-"%GitLocalInstallerScript%"
+START /WAIT /B CMD /C ""%GitLocalInstallerScript%" >nul 2>&1"
+IF ERRORLEVEL 1 (
+	ECHO WARNING: Git installation may have failed.
+) ELSE (
+	ECHO SUCCESS: Git installation completed
+)
 
 
 :: Clone repository

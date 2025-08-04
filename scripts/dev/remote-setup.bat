@@ -112,7 +112,28 @@ IF ERRORLEVEL 1 (
 :: Clone repository
 ECHO.
 ECHO [6/7] Cloning repository...
-"%Git%" clone %RepoGitUrl% %LocalRepo%
+
+:: Locate Git Executable
+SET "GitFound="
+
+GIT --version >nul 2>&1
+IF NOT ERRORLEVEL 1 (
+	SET "GitFound="GIT""
+) ELSE (
+	IF EXISTS %Git% (
+		SET "GitFound=%Git%"
+	) ELSE (
+		ECHO ERROR: Git executable not found.
+		GOTO :CLEANUP_ERROR
+	)
+)
+ECHO Found Git at: %GitFound%
+"%GitFound%" clone %RepoGitUrl% %LocalRepo% >nul 2>&1
+IF ERRORLEVEL 1 (
+	ECHO ERROR: Failed to clone repository.
+	GOTO :CLEANUP_ERROR
+)
+ECHO SUCCESS: Repository cloned successfully
 
 
 :: Open repository in Visual Studio Code

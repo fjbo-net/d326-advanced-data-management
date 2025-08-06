@@ -11,7 +11,14 @@ SET "GitInstallerUrl=https://github.com/git-for-windows/git/releases/download/v2
 SET "GitLocalInstaller=%UserDownloads%\%GitInstallerFileName%"
 
 :: Download Git for Windows
+ECHO.
+ECHO [1/2] Downloading Git for Windows installer...
 CURL -L -o %GitLocalInstaller% %GitInstallerUrl%
+ECHO SUCCESS: Git for Windows installer has been downloaded
+ECHO Installer Location: '%GitLocalInstaller%'
 
 :: Install Git for Windows
+ECHO.
+ECHO [2/2] Installing Git for Windows...
 %GitLocalInstaller% /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS
+ECHO SUCCESS: Git for Windows has been installed successfully

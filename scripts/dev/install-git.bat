@@ -13,7 +13,18 @@ SET "GitLocalInstaller=%UserDownloads%\%GitInstallerFileName%"
 :: Download Git for Windows
 ECHO.
 ECHO [1/2] Downloading Git for Windows installer...
-CURL -L -o %GitLocalInstaller% %GitInstallerUrl%
+CURL -L -f -s -o %GitLocalInstaller% %GitInstallerUrl%
+IF ERRORLEVEL 1 (
+	ECHO ERROR: Failed to download Git for Windows installer.
+	GOTO :CLEANUP_ERROR
+)
+
+:: Verify Git for Windows installer was downloaded
+IF NOT EXIST "%GitLocalInstaller%" (
+	ECHO ERROR: Git for Windows installer was not downloaded.
+	GOTO :CLEANUP_ERROR
+)
+
 ECHO SUCCESS: Git for Windows installer has been downloaded
 ECHO Installer Location: '%GitLocalInstaller%'
 

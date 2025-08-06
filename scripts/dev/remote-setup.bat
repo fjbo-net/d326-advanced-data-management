@@ -117,11 +117,13 @@ ECHO [6/7] Cloning repository...
 SET "GitFound="
 
 ECHO - Locating Git executable...
+ECHO -- Attempting system PATH...
 GIT --version >nul 2>&1
 IF NOT ERRORLEVEL 1 (
 	SET "GitFound=GIT"
 	ECHO Git has been located in the system 'PATH'
 ) ELSE (
+	ECHO -- Attempting default installation path...
 	IF EXIST "%Git%" (
 		SET "GitFound="%Git%""
 		ECHO Git has been located in the default installation path '%Git%'
@@ -131,6 +133,7 @@ IF NOT ERRORLEVEL 1 (
 	)
 )
 ECHO Found Git at: %GitFound%
+ECHO - Attempting to clone repository into '%LocalRepo%'
 "%GitFound%" clone %RepoGitUrl% "%LocalRepo%" >nul 2>&1
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.

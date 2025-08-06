@@ -20,7 +20,7 @@ IF ERRORLEVEL 1 (
 	GOTO :CLEANUP_ERROR
 )
 
-:: Verify Git script was downloaded
+:: Verify Visual Studio Code installer was downloaded
 IF NOT EXIST "%VsCodeLocalInstaller%" (
 	ECHO ERROR: Visual Studio Code installer was not downloaded.
 	GOTO :CLEANUP_ERROR

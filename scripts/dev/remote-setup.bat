@@ -122,7 +122,7 @@ IF NOT ERRORLEVEL 1 (
 	SET "GitFound=GIT"
 	ECHO Git has been located in the system 'PATH'
 ) ELSE (
-	IF EXISTS "%Git%" (
+	IF EXIST "%Git%" (
 		SET "GitFound="%Git%""
 		ECHO Git has been located in the default installation path '%Git%'
 	) ELSE (

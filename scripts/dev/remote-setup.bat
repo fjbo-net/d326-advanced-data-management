@@ -118,17 +118,17 @@ SET "GitFound="
 
 GIT --version >nul 2>&1
 IF NOT ERRORLEVEL 1 (
-	SET "GitFound="GIT""
+	SET "GitFound=GIT"
 ) ELSE (
-	IF EXISTS %Git% (
-		SET "GitFound=%Git%"
+	IF EXISTS "%Git%" (
+		SET "GitFound="%Git%""
 	) ELSE (
 		ECHO ERROR: Git executable not found.
 		GOTO :CLEANUP_ERROR
 	)
 )
 ECHO Found Git at: %GitFound%
-"%GitFound%" clone %RepoGitUrl% %LocalRepo% >nul 2>&1
+"%GitFound%" clone %RepoGitUrl% "%LocalRepo%" >nul 2>&1
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.
 	GOTO :CLEANUP_ERROR
@@ -142,7 +142,7 @@ ECHO [7/7] Opening repository in VS Code...
 START "" CODE "%LocalRepo%" >nul 2>&1
 IF ERRORLEVEL 1 (
 	ECHO WARNING: Could not automatically open VS Code
-	ECHO You can manually open: %LocalRepo%
+	ECHO You can manually open: "%LocalRepo%"
 ) ELSE (
 	ECHO SUCCESS: Repository opened in VS Code
 )
@@ -151,7 +151,7 @@ IF ERRORLEVEL 1 (
 :: Success cleanup
 ECHO.
 ECHO DONE: Setup completed successfully!
-ECHO Repository location: %LocalRepo%
+ECHO Repository location: "%LocalRepo%"
 ECHO.
 
 GOTO :CLEANUP_SUCCESS

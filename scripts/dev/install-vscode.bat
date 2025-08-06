@@ -32,7 +32,11 @@ ECHO Installer Location: '%VsCodeLocalInstaller%'
 :: Install Visual Studio Code
 ECHO.
 ECHO [2/2] Installing Visual Studio Code...
-%VsCodeLocalInstaller% /VERYSILENT /SUPPRESSMSGBOXES /MERGETASKS="!runcode,addcontextmenufiles,addcontextmenufolders"
+START /WAIT /B CMD /C ""%VsCodeLocalInstaller%" /VERYSILENT /SUPPRESSMSGBOXES /MERGETASKS="!runcode,addcontextmenufiles,addcontextmenufolders""
+IF ERRORLEVEL 1 (
+    ECHO ERROR: Visual Studio Code installation failed
+    GOTO :CLEANUP_ERROR
+)
 ECHO SUCCESS: Visual Studio has been installed successfully
 
 

@@ -134,7 +134,7 @@ IF NOT ERRORLEVEL 1 (
 )
 ECHO Found Git at: %GitFound%
 ECHO - Attempting to clone repository into '%LocalRepo%'
-"%GitFound%" clone %RepoGitUrl% "%LocalRepo%" >nul 2>&1
+"%GitFound%" clone --quiet %RepoGitUrl% "%LocalRepo%"
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.
 	GOTO :CLEANUP_ERROR

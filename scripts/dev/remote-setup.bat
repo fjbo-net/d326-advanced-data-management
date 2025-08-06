@@ -111,29 +111,7 @@ IF ERRORLEVEL 1 (
 
 :: Clone repository
 ECHO.
-ECHO [6/7] Cloning repository...
-
-:: Locate Git Executable
-SET "GitFound="
-
-ECHO - Locating Git executable...
-ECHO -- Attempting system PATH...
-GIT --version >nul 2>&1
-IF NOT ERRORLEVEL 1 (
-	SET "GitFound=GIT"
-	ECHO Git has been located in the system 'PATH'
-) ELSE (
-	ECHO -- Attempting default installation path...
-	IF EXIST "%Git%" (
-		SET "GitFound=%Git%"
-		ECHO Git has been located in the default installation path '%Git%'
-	) ELSE (
-		ECHO ERROR: Git executable not found.
-		GOTO :CLEANUP_ERROR
-	)
-)
-ECHO Found Git at: %GitFound%
-ECHO - Attempting to clone repository into '%LocalRepo%'
+ECHO [6/7] Cloning repository into '%LocalRepo%'...
 "%GitFound%" clone --quiet %RepoGitUrl% "%LocalRepo%"
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.

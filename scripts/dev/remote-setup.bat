@@ -125,7 +125,7 @@ IF NOT ERRORLEVEL 1 (
 ) ELSE (
 	ECHO -- Attempting default installation path...
 	IF EXIST "%Git%" (
-		SET "GitFound="%Git%""
+		SET "GitFound=%Git%"
 		ECHO Git has been located in the default installation path '%Git%'
 	) ELSE (
 		ECHO ERROR: Git executable not found.

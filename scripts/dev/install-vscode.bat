@@ -23,3 +23,30 @@ ECHO.
 ECHO [2/2] Installing Visual Studio Code...
 %VsCodeLocalInstaller% /VERYSILENT /SUPPRESSMSGBOXES /MERGETASKS="!runcode,addcontextmenufiles,addcontextmenufolders"
 ECHO SUCCESS: Visual Studio has been installed successfully
+
+
+:: Success cleanup
+ECHO.
+ECHO DONE: Visual Studio Code has been installed successfully!
+ECHO.
+
+GOTO :CLEANUP_SUCCESS
+
+
+:CLEANUP_ERROR
+ECHO.
+ECHO ERROR: Visual Studio Code installation could not be completed!
+ECHO.
+
+
+:CLEANUP_SUCCESS
+:: Clean up temporary files
+IF EXIST "%VsCodeLocalInstaller%" (
+	DEL /Q "%VsCodeLocalInstaller%" >nul 2>&1
+)
+
+IF DEFINED CLEANUP_ERROR (
+	EXIT /B 1
+) ELSE (
+	EXIT /B 0
+)

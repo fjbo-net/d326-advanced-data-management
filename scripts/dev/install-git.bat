@@ -31,7 +31,11 @@ ECHO Installer Location: '%GitLocalInstaller%'
 :: Install Git for Windows
 ECHO.
 ECHO [2/2] Installing Git for Windows...
-%GitLocalInstaller% /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS
+START /WAIT /B CMD /C ""%GitLocalInstaller%" /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS"
+IF ERRORLEVEL 1 (
+    ECHO ERROR: Git for Windows installation failed
+    GOTO :CLEANUP_ERROR
+)
 ECHO SUCCESS: Git for Windows has been installed successfully
 
 

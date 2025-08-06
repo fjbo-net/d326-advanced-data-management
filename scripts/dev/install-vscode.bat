@@ -14,7 +14,18 @@ SET "VsCodeLocalInstaller=%UserDownloads%\%VsCodeInstallerFileName%"
 :: Download Visual Studio Code installer
 ECHO.
 ECHO [1/2] Downloading Visual Studio Code installer...
-CURL -L -o %VsCodeLocalInstaller% %VsCodeInstallerUrl%
+CURL -L -f -s -o %VsCodeLocalInstaller% %VsCodeInstallerUrl%
+IF ERRORLEVEL 1 (
+	ECHO ERROR: Failed to download Visual Studio Code installer.
+	GOTO :CLEANUP_ERROR
+)
+
+:: Verify Git script was downloaded
+IF NOT EXIST "%VsCodeLocalInstaller%" (
+	ECHO ERROR: Visual Studio Code installer was not downloaded.
+	GOTO :CLEANUP_ERROR
+)
+
 ECHO SUCCESS: Visual Studio Code installer has been downloaded
 ECHO Installer Location: '%VsCodeLocalInstaller%'
 

@@ -16,5 +16,5 @@ To configure a provisioned lab:
 
 Or use the following command to setup the provisioned lab:
 ``` batch
-CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/11-add-dev-setup/scripts/dev/remote-setup.bat && remote-setup.bat
+CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/main/scripts/dev/remote-setup.bat && remote-setup.bat
 ```

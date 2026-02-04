@@ -10,3 +10,6 @@ tmp/
 
 # Visual Studio
 .vs/
+
+# User Files
+.user/

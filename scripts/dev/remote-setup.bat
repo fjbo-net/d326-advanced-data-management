@@ -111,7 +111,7 @@ IF ERRORLEVEL 1 (
 
 :: Clone repository
 ECHO.
-ECHO [6/7] Cloning repository into '%LocalRepo%'...
+ECHO [6/8] Cloning repository into '%LocalRepo%'...
 "%GitFound%" clone --quiet %RepoGitUrl% "%LocalRepo%"
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.
@@ -120,9 +120,20 @@ IF ERRORLEVEL 1 (
 ECHO SUCCESS: Repository cloned successfully
 
 
+:: Set up user PATH for PostgreSQL
+ECHO.
+ECHO [7/8] Setting up user PATH for PostgreSQL...
+CALL "%LocalRepo%\scripts\dev\setup-user-path.bat"
+IF ERRORLEVEL 1 (
+    ECHO WARNING: Failed to set up PostgreSQL PATH.
+) ELSE (
+    ECHO SUCCESS: PostgreSQL PATH setup completed.
+)
+
+
 :: Open repository in Visual Studio Code
 ECHO.
-ECHO [7/7] Opening repository in VS Code...
+ECHO [8/8] Opening repository in VS Code...
 START "" CODE "%LocalRepo%" >nul 2>&1
 IF ERRORLEVEL 1 (
 	ECHO WARNING: Could not automatically open VS Code

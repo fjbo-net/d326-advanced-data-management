@@ -19,6 +19,8 @@ Or use the following command to setup the provisioned lab:
 CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/main/scripts/dev/remote-setup.bat && remote-setup.bat
 ```
 
+## PostgreSQL
+
 ### Data Set
 The following Entity-Relationship Diagram includes all entities in the DVD Rental Sample Database:
 
@@ -162,4 +164,17 @@ erDiagram
 	FILM ||--o{ FILM_ACTOR: ""
 	ACTOR ||--o{ FILM_ACTOR: ""
 
+```
+
+### PostgreSQL Command-Line Interface
+PostgreSQL can be accessed via command-line interface using `psql`. The lab's default user is `postgres`.
+
+To connect to PostgreSQL via CLI:
+```batch
+psql -U postgres -d dvdrental
+```
+
+To execute a SQL file:
+``` batch
+psql -U postgres -d dvdrental -f script.sql
 ```

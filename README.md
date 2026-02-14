@@ -1,6 +1,7 @@
 # D326 - Advanced Data Management 
 Project for the Performance Assessment for the course D326 Advanced Data Management.
 
+
 ## Set Up
 
 Use the following steps to configure the pre-requisites for the project:
@@ -18,6 +19,7 @@ Or use the following command to setup the provisioned lab:
 ``` batch
 CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/main/scripts/dev/remote-setup.bat && remote-setup.bat
 ```
+
 
 ## PostgreSQL
 

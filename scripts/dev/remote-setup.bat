@@ -112,7 +112,7 @@ IF ERRORLEVEL 1 (
 :: Clone repository
 ECHO.
 ECHO [6/8] Cloning repository into '%LocalRepo%'...
-"%GitFound%" clone --quiet %RepoGitUrl% "%LocalRepo%"
+"%Git%" clone --quiet %RepoGitUrl% "%LocalRepo%"
 IF ERRORLEVEL 1 (
 	ECHO ERROR: Failed to clone repository.
 	GOTO :CLEANUP_ERROR

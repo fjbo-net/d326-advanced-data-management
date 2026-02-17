@@ -186,7 +186,7 @@ psql -U postgres -d dvdrental -f script.sql
 
 ### Business Question
 
-Given the database data, I decided to ask the following question:
+Given the database data, I decided to answer the following question:
 
 ** Which film category generates the most rentals in each city where the business operates?**
 

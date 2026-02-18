@@ -1,6 +1,7 @@
 # D326 - Advanced Data Management 
 Project for the Performance Assessment for the course D326 Advanced Data Management.
 
+
 ## Set Up
 
 Use the following steps to configure the pre-requisites for the project:
@@ -18,6 +19,7 @@ Or use the following command to setup the provisioned lab:
 ``` batch
 CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/main/scripts/dev/remote-setup.bat && remote-setup.bat
 ```
+
 
 ## PostgreSQL
 
@@ -178,3 +180,23 @@ To execute a SQL file:
 ``` batch
 psql -U postgres -d dvdrental -f script.sql
 ```
+
+
+## Business Analysis
+
+### Business Question
+
+Given the database data, I decided to answer the following question:
+
+**Which film category generates the most rentals in each city where the business operates?**
+
+
+### Business Value
+The chosen business question provides valuable insights into regional customer preferences. This information can directly provide key business decisions and implement strategies like the optimization of inventory and help uncover patterns and trends.
+
+Keeping a higher stock for the most popular film category for each region or branch could potentially maximize the revenue from each of the branches.
+
+Business intelligence can help uncover patterns and trends by analyzing the resulting data from analyizing the most popular film categories for each of the branches, which could help craft more effective targeted marketing campaigns.
+
+I believe the chosen Business Question is a solid foundation upon data analytics and business intelligence approaches can be built on.
+

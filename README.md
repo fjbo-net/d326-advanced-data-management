@@ -192,7 +192,7 @@ Given the database data, I decided to answer the following question:
 
 
 ### Business Value
-The chosen business question provides valuable insights into regional customer preferences. This information can directly provide key business decisions and implement strategies like the optmization of inventory and help uncover patterns and trends.
+The chosen business question provides valuable insights into regional customer preferences. This information can directly provide key business decisions and implement strategies like the optimization of inventory and help uncover patterns and trends.
 
 Keeping a higher stock for the most popular film category for each region or branch could potentially maximize the revenue from each of the branches.
 

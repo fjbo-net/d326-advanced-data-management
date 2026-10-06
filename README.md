@@ -200,3 +200,46 @@ Business intelligence can help uncover patterns and trends by analyzing the resu
 
 I believe the chosen Business Question is a solid foundation upon data analytics and business intelligence approaches can be built on.
 
+
+### Source Tables
+
+To answer the business question, the following tables from the DVD Rental database are required. They fall into two groups: the core dimension tables that directly hold the values being analyzed, and the bridge tables needed to connect them across the schema.
+
+#### Core Tables
+
+| Table | Key Fields Used | Role in Report |
+|-------|----------------|----------------|
+| `rental` | `rental_id`, `rental_date`, `inventory_id`, `customer_id` | Primary fact table. Every row represents one rental event. Rental counts aggregated from this table answer the "most rentals" part of the business question. |
+| `category` | `category_id`, `name` | Provides the category name (e.g., Action, Comedy, Sports) that serves as one of the two grouping dimensions in both the detailed and summary tables. |
+| `city` | `city_id`, `city` | Provides the city name that serves as the geographic grouping dimension in both the detailed and summary tables. |
+
+#### Bridge Tables
+
+These tables are required to connect the core tables through the schema's foreign key relationships.
+
+| Table | Joins | Role in Report |
+|-------|-------|----------------|
+| `inventory` | `rental.inventory_id` → `inventory.inventory_id`; `inventory.film_id` → `film_category.film_id` | Links each rental to a specific film copy, which provides the `film_id` needed to reach the category dimension. Also provides `store_id` for potential store-level filtering. |
+| `film_category` | `inventory.film_id` → `film_category.film_id`; `film_category.category_id` → `category.category_id` | Junction table that resolves the many-to-many relationship between films and categories. Required to map a rented film to its category. |
+| `customer` | `rental.customer_id` → `customer.customer_id`; `customer.address_id` → `address.address_id` | Links each rental to the customer who made it, providing the `address_id` needed to reach the city dimension. |
+| `address` | `customer.address_id` → `address.address_id`; `address.city_id` → `city.city_id` | Links customer records to their city, bridging the customer and city dimensions. |
+
+#### Optional Enrichment Table
+
+| Table | Key Fields Used | Role in Report |
+|-------|----------------|----------------|
+| `film` | `film_id`, `title` | Provides the film title for the detailed table, giving analysts a human-readable record of which specific film was rented. Not required for the summary aggregation. |
+
+#### Full JOIN Path
+
+```
+rental
+  ├── INNER JOIN inventory    ON rental.inventory_id  = inventory.inventory_id
+  │     ├── INNER JOIN film           ON inventory.film_id     = film.film_id
+  │     └── INNER JOIN film_category  ON inventory.film_id     = film_category.film_id
+  │               └── INNER JOIN category  ON film_category.category_id = category.category_id
+  └── INNER JOIN customer    ON rental.customer_id   = customer.customer_id
+            └── INNER JOIN address   ON customer.address_id  = address.address_id
+                      └── INNER JOIN city      ON address.city_id       = city.city_id
+```
+

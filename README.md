@@ -365,3 +365,33 @@ The fields the report aggregates. Each is computed over the detailed-table rows 
 | 7 | `distinct_customers` | `integer` | `NOT NULL` | `COUNT(DISTINCT customer_id)` per city and category | How many different customers produced those rentals. Distinguishes broad local appetite for a category from a few heavy renters, which call for opposite responses — more copies in the first case, a loyalty or recommendation play in the second. |
 | 8 | `outstanding_rentals` | `integer` | `NOT NULL` | Count of rows whose `rental_status` is `Outstanding` | How many of the category's copies are off the shelf and not yet returned. Read next to `rental_count`, it shows a popular category whose demand is being throttled by unavailable stock — a signal to reorder rather than merely restock. |
 | 9 | `latest_rental_date` | `date` | `NOT NULL` | `MAX(rental_date)` cast to a date | The most recent rental of the category in the city. Tells the reader whether a leading position is current or historical, so a category that led a year ago and has since gone quiet is not restocked on the strength of a stale count. |
+
+#### Data Types
+
+The summary table draws on four kinds of data. The two dimensions keep the native PostgreSQL types of their source columns; the seven measures do not exist in the source schema at all, so their types are chosen for the values the aggregation can actually produce.
+
+| Kind of Data | Fields | PostgreSQL Type | Notes |
+|--------------|--------|-----------------|-------|
+| Descriptive text dimensions | `city`, `category_name` | `character varying(50)`, `character varying(25)` | Declared at the same lengths as `city.city` and `category.name`, so no value can be truncated on its way into the summary. Carried as names rather than as the underlying `city_id` and `category_id` keys, because the summary table is read by stakeholders who recognize `Sports`, not `15`. |
+| Whole-number counts | `rental_count`, `city_rental_total`, `distinct_customers`, `outstanding_rentals` | `integer` | Counts of rows and of distinct customers — whole, non-negative, and never fractional, so an integer type rather than a decimal one. |
+| Ordinal position | `category_rank` | `integer` | A rank is a position, not a quantity: it is sorted and filtered (`= 1`) but never summed or averaged. Typed as an `integer` for consistency with the counters above, even though it is bounded by the sixteen categories in the catalog. |
+| Percentage measure | `share_of_city_rentals` | `numeric(5,2)` | An exact decimal share. Five total digits with two to the right of the decimal point — three digits ahead of it — which covers the full `0.00` to `100.00` range the field can hold. |
+| Calendar date | `latest_rental_date` | `date` | A day, with no time of day. |
+
+##### Why These Types
+
+- **`integer` rather than `bigint` for the counters.** PostgreSQL's `COUNT()` and `SUM()` return `bigint`, and `DENSE_RANK()` returns `bigint`, so each of these fields is an explicit narrowing of the aggregate's own type. It is a safe narrowing: the whole `rental` table is on the order of sixteen thousand rows, and `city_rental_total` — the largest value any of these fields can hold — is bounded by that total, four orders of magnitude below the `integer` ceiling of 2,147,483,647. A `bigint` would spend eight bytes per value to store a number that never needs more than four, in a table that stakeholders read as a grid of numbers.
+- **`integer` rather than `smallint` for `category_rank`.** A `smallint` would hold a rank of at most 16 comfortably. Keeping every counter in the table one type is worth more than the two bytes, because it means a reader never has to ask why one numeric column is declared differently from its neighbours.
+- **`numeric(5,2)` rather than `double precision` for the share.** `numeric` is exact, so the shares of a city's categories add up to the figure a reader expects instead of to a floating-point approximation of it, and a published report never shows `9.600000000000001`. The scale of `2` is set deliberately: a hundredth of a percent is finer than any stocking decision needs, and it is enough to break the visual tie between two categories that both round to the same whole percent.
+- **An explicit decimal cast is required to compute the share.** Both operands are integers, and integer division in PostgreSQL truncates — `42 / 181` evaluates to `0`, not to `0.23`. The numerator is therefore multiplied by `100.0`, a `numeric` literal, before the division, so the whole expression is evaluated in exact decimal arithmetic and then rounded to two places.
+- **`date` rather than `timestamp without time zone` for `latest_rental_date`.** The detailed table carries `rental_date` as a microsecond-precision timestamp, which is right for a row that describes a single transaction. A summary row describes many transactions, and the minute and second of the last one is noise in that context: what a reader wants from the field is whether the category was rented recently, which a calendar date answers.
+
+##### Nullability
+
+**Every field of the summary table is `NOT NULL`**, and this is a property of how the table is built rather than a constraint imposed on top of it:
+
+- A row exists only because at least one rental produced it, so every aggregate has at least one value to compute from. There are no empty groups to return a `NULL` count or a `NULL` maximum.
+- The source columns behind the fields — `city.city`, `category.name`, `rental.rental_id`, `rental.customer_id` and `rental.rental_date` — are all `NOT NULL` in the DVD Rental schema, so nothing nullable enters the aggregation in the first place.
+- `rental.return_date`, the one nullable column the report touches, never reaches the summary table as a date. It is absorbed into `outstanding_rentals`, where a missing return is counted as a `1` instead of being displayed as a blank. The transformation described in [Field Transformation](#field-transformation) is what makes that possible, and it is the reason the summary table can promise a reader that no cell in it is ever empty.
+
+A city and category pair with no rentals produces **no row**, rather than a row of zeros. The summary table reports observed demand, and a missing pair means no rental of that category was recorded in that city — which may mean there was no appetite for it or that no copies were ever stocked there. The summary table cannot tell those two apart; `store_id` in the detailed table is where that question is settled.

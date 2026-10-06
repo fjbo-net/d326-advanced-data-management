@@ -291,3 +291,34 @@ The detailed table draws on four kinds of data. Every type below is the native P
 | Derived text | `rental_status`, `customer_name` | `character varying(20)`, `character varying(91)` | Produced at query time by user-defined functions rather than read from a column. `character varying(91)` accommodates the longest possible full name: two `character varying(45)` names plus a separating space. |
 
 No numeric measures appear in the detailed table. The report's single measure — the rental count — is a product of aggregation and therefore belongs to the summary table, not to the row-level detail.
+
+#### Field Transformation
+
+Two fields of the detailed table cannot be read straight out of a column and require a custom transformation implemented as a PostgreSQL user-defined function.
+
+##### `rental_status` — primary transformation
+
+| | |
+|---|---|
+| **Source field** | `rental.return_date` (`timestamp without time zone`, nullable) |
+| **Transformed into** | `rental_status` (`character varying(20)`) |
+| **Function** | `fn_rental_status(return_date timestamp) RETURNS character varying(20)` |
+| **Output values** | `Returned`, `Outstanding` |
+
+The raw `return_date` is `NULL` for every rental whose copy has not been brought back. A `NULL` cell is not a neutral absence of information to a nontechnical stakeholder — it reads as a data error, as a blank that may have been dropped by the report, or as nothing at all. It also cannot be filtered or sorted in a spreadsheet the way a word can.
+
+This field should be transformed with a user-defined function for three reasons:
+
+1. **Readability.** A raw timestamp such as `2007-02-15 22:25:46.996577` tells a stakeholder only that *something* happened, and a blank tells them nothing. `Returned` and `Outstanding` state the fact of the matter in the vocabulary the business already uses.
+2. **Consistency.** The same labelling rule is needed wherever rentals are reported. Encapsulating it in a function means the detailed table, the summary table and any future report all derive the status from one definition, so the wording can never drift between sections — and if the business later wants a third state such as `Overdue`, the rule changes in exactly one place.
+3. **Business value.** `Outstanding` is directly actionable: it marks a copy that is off the shelf and therefore unavailable to rent. Because the detailed table also carries `city`, `category_name` and `store_id`, a reader can immediately see whether a popular category in a given city is being held back by copies that never came back — which is a stocking problem the summary count alone would hide.
+
+##### `customer_name` — supporting transformation
+
+| | |
+|---|---|
+| **Source fields** | `customer.first_name`, `customer.last_name` (`character varying(45)` each) |
+| **Transformed into** | `customer_name` (`character varying(91)`) |
+| **Function** | `fn_customer_name(first_name character varying, last_name character varying) RETURNS character varying(91)` |
+
+The schema stores a person's name across two columns, which is correct for storage and wrong for a report: it costs the reader two columns of width and asks them to assemble the name themselves. The function combines both parts into a single field and normalizes capitalization, so the output reads the same way regardless of how a record was keyed in at the counter. A user-defined function is the right place for this because the rule — which part comes first, how the parts are separated, how casing is normalized — is a presentation decision that should be stated once and reused, not repeated inside every query that happens to need a name.

@@ -368,7 +368,7 @@ The fields the report aggregates. Each is computed over the detailed-table rows 
 
 #### Data Types
 
-The summary table draws on four kinds of data. The two dimensions keep the native PostgreSQL types of their source columns; the seven measures do not exist in the source schema at all, so their types are chosen for the values the aggregation can actually produce.
+The summary table draws on five kinds of data. The two dimensions keep the native PostgreSQL types of their source columns; the seven measures do not exist in the source schema at all, so their types are chosen for the values the aggregation can actually produce.
 
 | Kind of Data | Fields | PostgreSQL Type | Notes |
 |--------------|--------|-----------------|-------|

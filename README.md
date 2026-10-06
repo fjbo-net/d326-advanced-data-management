@@ -243,3 +243,18 @@ rental
                       └── INNER JOIN city      ON address.city_id       = city.city_id
 ```
 
+#### Why Each Table Is Necessary
+
+| Table | Data Provided for the Detailed Table | Data Provided for the Summary Table |
+|-------|--------------------------------------|-------------------------------------|
+| `rental` | One row per rental event (`rental_id`, `rental_date`) | The rows counted to find the category with the most rentals in each city |
+| `category` | The category `name` of each rental | The category being ranked within each city |
+| `city` | The `city` of the customer who made each rental | The city used to group the rentals |
+| `inventory` | Connects each rental to a film (`film_id`) | Connects each rental to a film so it can be assigned a category |
+| `film_category` | Maps each rented film to its category | Assigns each counted rental to a category |
+| `customer` | Identifies who made each rental (`customer_id`) | Connects each counted rental to a customer address |
+| `address` | Connects each customer to a city | Connects each counted rental to a city |
+| `film` | The film `title` of each rental (optional) | Not needed |
+
+Together, the core and bridge tables supply every value the summary aggregation needs, and the detailed table draws on the same tables at the level of individual rentals.
+

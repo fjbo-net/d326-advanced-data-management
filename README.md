@@ -278,3 +278,16 @@ The detailed table is the most granular section of the report: **one row per ren
 | 8 | `customer_id` | `smallint` | `rental.customer_id` | Identifies the customer behind each rental. Supports per-customer drill-down and makes it possible to tell a category driven by many customers from one driven by a single heavy renter. |
 | 9 | `customer_name` | `character varying(91)` — **transformed** | Derived from `customer.first_name` and `customer.last_name` | The customer's full name as a single readable value, so stakeholders are not asked to mentally join two columns. See [Field Transformation](#field-transformation). |
 | 10 | `store_id` | `smallint` | `inventory.store_id` | The branch that supplied the rented copy. Enables the report to be read per branch, which is where an inventory decision is ultimately acted on. |
+
+#### Data Types
+
+The detailed table draws on four kinds of data. Every type below is the native PostgreSQL type of the source column, except for the two derived fields, whose types are the return types of the user-defined functions that produce them.
+
+| Kind of Data | Fields | PostgreSQL Type | Notes |
+|--------------|--------|-----------------|-------|
+| Numeric identifiers | `rental_id`, `customer_id`, `store_id` | `integer`, `smallint` | Whole numbers used as keys, never as measures. `rental_id` is an `integer`; `customer_id` and `store_id` are `smallint` in the source schema. They are never summed — only counted or used to join. |
+| Date and time values | `rental_date`, `return_date` | `timestamp without time zone` | Microsecond-precision timestamps with no time zone offset. `return_date` is the only nullable field in the table, which is why it is transformed before being shown. |
+| Descriptive text | `city`, `category_name`, `film_title` | `character varying(50)`, `character varying(25)`, `character varying(255)` | Variable-length strings carrying the labels a nontechnical reader actually reads. These are the grouping dimensions of the report, so they are shown as names rather than as the underlying surrogate keys. |
+| Derived text | `rental_status`, `customer_name` | `character varying(20)`, `character varying(91)` | Produced at query time by user-defined functions rather than read from a column. `character varying(91)` accommodates the longest possible full name: two `character varying(45)` names plus a separating space. |
+
+No numeric measures appear in the detailed table. The report's single measure — the rental count — is a product of aggregation and therefore belongs to the summary table, not to the row-level detail.

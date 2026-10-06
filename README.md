@@ -258,3 +258,78 @@ rental
 
 Together, the core and bridge tables supply every value the summary aggregation needs, and the detailed table draws on the same tables at the level of individual rentals.
 
+
+
+### Detailed Table
+
+The detailed table is the most granular section of the report: **one row per rental event**. No aggregation is applied, so every row can be traced back to a single transaction in the `rental` table. The summary table is produced by aggregating exactly these rows, which keeps both sections of the report consistent with one another.
+
+#### Fields
+
+| # | Field | Data Type | Source | Business Purpose |
+|---|-------|-----------|--------|------------------|
+| 1 | `rental_id` | `integer` | `rental.rental_id` | Unique identifier of the rental event. Guarantees every row of the detailed table is distinct and gives stakeholders an audit key to trace any number in the summary table back to the originating transaction. |
+| 2 | `rental_date` | `timestamp without time zone` | `rental.rental_date` | The moment the rental occurred. Allows the report to be filtered or trended over a period, so a category's popularity can be evaluated for a specific season, quarter or year rather than over the whole history. |
+| 3 | `return_date` | `timestamp without time zone` (nullable) | `rental.return_date` | The moment the copy was returned. `NULL` when the copy has not come back yet. Source value for the transformed `rental_status` field. |
+| 4 | `rental_status` | `character varying(20)` — **transformed** | Derived from `rental.return_date` | Human-readable completion state of the rental (`Returned` / `Outstanding`). Replaces a `NULL` timestamp, which is meaningless to a nontechnical reader, with an explicit business label. See [Field Transformation](#field-transformation). |
+| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the field the summary table groups by. |
+| 6 | `category_name` | `character varying(25)` | `category.name` | The category dimension of the business question (e.g. Action, Comedy, Sports). This is the value being counted and ranked per city in the summary table. |
+| 7 | `film_title` | `character varying(255)` | `film.title` | The specific film that was rented. Lets an analyst see *which* titles are driving a category's popularity in a city, which is the level of detail needed to make a stocking decision. |
+| 8 | `customer_id` | `smallint` | `rental.customer_id` | Identifies the customer behind each rental. Supports per-customer drill-down and makes it possible to tell a category driven by many customers from one driven by a single heavy renter. |
+| 9 | `customer_name` | `character varying(91)` — **transformed** | Derived from `customer.first_name` and `customer.last_name` | The customer's full name as a single readable value, so stakeholders are not asked to mentally join two columns. See [Field Transformation](#field-transformation). |
+| 10 | `store_id` | `smallint` | `inventory.store_id` | The branch that supplied the rented copy. Enables the report to be read per branch, which is where an inventory decision is ultimately acted on. |
+
+#### Data Types
+
+The detailed table draws on four kinds of data. Every type below is the native PostgreSQL type of the source column, except for the two derived fields, whose types are the return types of the user-defined functions that produce them.
+
+| Kind of Data | Fields | PostgreSQL Type | Notes |
+|--------------|--------|-----------------|-------|
+| Numeric identifiers | `rental_id`, `customer_id`, `store_id` | `integer`, `smallint` | Whole numbers used as keys, never as measures. `rental_id` is an `integer`; `customer_id` and `store_id` are `smallint` in the source schema. They are never summed — only counted or used to join. |
+| Date and time values | `rental_date`, `return_date` | `timestamp without time zone` | Microsecond-precision timestamps with no time zone offset. `return_date` is the only nullable field in the table, which is why it is transformed before being shown. |
+| Descriptive text | `city`, `category_name`, `film_title` | `character varying(50)`, `character varying(25)`, `character varying(255)` | Variable-length strings carrying the labels a nontechnical reader actually reads. These are the grouping dimensions of the report, so they are shown as names rather than as the underlying surrogate keys. |
+| Derived text | `rental_status`, `customer_name` | `character varying(20)`, `character varying(91)` | Produced at query time by user-defined functions rather than read from a column. `character varying(91)` accommodates the longest possible full name: two `character varying(45)` names plus a separating space. |
+
+No numeric measures appear in the detailed table. The report's single measure — the rental count — is a product of aggregation and therefore belongs to the summary table, not to the row-level detail.
+
+#### Field Transformation
+
+Two fields of the detailed table cannot be read straight out of a column and require a custom transformation implemented as a PostgreSQL user-defined function.
+
+##### `rental_status` — primary transformation
+
+| | |
+|---|---|
+| **Source field** | `rental.return_date` (`timestamp without time zone`, nullable) |
+| **Transformed into** | `rental_status` (`character varying(20)`) |
+| **Function** | `fn_rental_status(return_date timestamp) RETURNS character varying(20)` |
+| **Output values** | `Returned`, `Outstanding` |
+
+The raw `return_date` is `NULL` for every rental whose copy has not been brought back. A `NULL` cell is not a neutral absence of information to a nontechnical stakeholder — it reads as a data error, as a blank that may have been dropped by the report, or as nothing at all. It also cannot be filtered or sorted in a spreadsheet the way a word can.
+
+This field should be transformed with a user-defined function for three reasons:
+
+1. **Readability.** A raw timestamp such as `2007-02-15 22:25:46.996577` tells a stakeholder only that *something* happened, and a blank tells them nothing. `Returned` and `Outstanding` state the fact of the matter in the vocabulary the business already uses.
+2. **Consistency.** The same labelling rule is needed wherever rentals are reported. Encapsulating it in a function means the detailed table, the summary table and any future report all derive the status from one definition, so the wording can never drift between sections — and if the business later wants a third state such as `Overdue`, the rule changes in exactly one place.
+3. **Business value.** `Outstanding` is directly actionable: it marks a copy that is off the shelf and therefore unavailable to rent. Because the detailed table also carries `city`, `category_name` and `store_id`, a reader can immediately see whether a popular category in a given city is being held back by copies that never came back — which is a stocking problem the summary count alone would hide.
+
+##### `customer_name` — supporting transformation
+
+| | |
+|---|---|
+| **Source fields** | `customer.first_name`, `customer.last_name` (`character varying(45)` each) |
+| **Transformed into** | `customer_name` (`character varying(91)`) |
+| **Function** | `fn_customer_name(first_name character varying, last_name character varying) RETURNS character varying(91)` |
+
+The schema stores a person's name across two columns, which is correct for storage and wrong for a report: it costs the reader two columns of width and asks them to assemble the name themselves. The function combines both parts into a single field and normalizes capitalization, so the output reads the same way regardless of how a record was keyed in at the counter. A user-defined function is the right place for this because the rule — which part comes first, how the parts are separated, how casing is normalized — is a presentation decision that should be stated once and reused, not repeated inside every query that happens to need a name.
+
+#### Business Use of the Detailed Table
+
+The summary table answers the business question; the detailed table is what makes the answer usable and trustworthy.
+
+- **It makes the answer verifiable.** Any figure in the summary table is a count of rows that exist in the detailed table. A regional manager who doubts that Sports really is the top category in their city can filter the detail to that city and category and see the individual rentals behind the number. An answer that can be checked is an answer a decision can be based on.
+- **It turns a category into a buying list.** Knowing that Comedy leads in a city does not tell a buyer what to order. The detailed table carries `film_title` alongside `city` and `category_name`, so the same data shows which specific titles produced that lead — the level at which a purchase order is actually written.
+- **It localizes the decision to a branch.** `store_id` identifies the branch that supplied each rented copy, so demand concentrated in one location is not mistaken for demand across the city. Inventory is held per store, so this is the level at which a stocking change is made.
+- **It exposes supply problems the summary hides.** A category's rental count measures what customers *did* rent, not what they *wanted* to rent. Reading `rental_status` next to `category_name` and `store_id` shows where popular stock is sitting unreturned, which flags a title that should be reordered rather than simply restocked.
+- **It supports targeted marketing.** `customer_id` and `customer_name` make each rental attributable, so a campaign for a category that is strong in a city can be aimed at the customers who already rent from it instead of at the city at large.
+- **It separates breadth from volume.** A category can lead a city because many customers rent from it or because a few customers rent from it heavily. Those two situations call for opposite responses, and only the row-level detail distinguishes them.

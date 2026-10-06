@@ -258,3 +258,23 @@ rental
 
 Together, the core and bridge tables supply every value the summary aggregation needs, and the detailed table draws on the same tables at the level of individual rentals.
 
+
+
+### Detailed Table
+
+The detailed table is the most granular section of the report: **one row per rental event**. No aggregation is applied, so every row can be traced back to a single transaction in the `rental` table. The summary table is produced by aggregating exactly these rows, which keeps both sections of the report consistent with one another.
+
+#### Fields
+
+| # | Field | Data Type | Source | Business Purpose |
+|---|-------|-----------|--------|------------------|
+| 1 | `rental_id` | `integer` | `rental.rental_id` | Unique identifier of the rental event. Guarantees every row of the detailed table is distinct and gives stakeholders an audit key to trace any number in the summary table back to the originating transaction. |
+| 2 | `rental_date` | `timestamp without time zone` | `rental.rental_date` | The moment the rental occurred. Allows the report to be filtered or trended over a period, so a category's popularity can be evaluated for a specific season, quarter or year rather than over the whole history. |
+| 3 | `return_date` | `timestamp without time zone` (nullable) | `rental.return_date` | The moment the copy was returned. `NULL` when the copy has not come back yet. Source value for the transformed `rental_status` field. |
+| 4 | `rental_status` | `character varying(20)` — **transformed** | Derived from `rental.return_date` | Human-readable completion state of the rental (`Returned` / `Outstanding`). Replaces a `NULL` timestamp, which is meaningless to a nontechnical reader, with an explicit business label. See [Field Transformation](#field-transformation). |
+| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the field the summary table groups by. |
+| 6 | `category_name` | `character varying(25)` | `category.name` | The category dimension of the business question (e.g. Action, Comedy, Sports). This is the value being counted and ranked per city in the summary table. |
+| 7 | `film_title` | `character varying(255)` | `film.title` | The specific film that was rented. Lets an analyst see *which* titles are driving a category's popularity in a city, which is the level of detail needed to make a stocking decision. |
+| 8 | `customer_id` | `smallint` | `rental.customer_id` | Identifies the customer behind each rental. Supports per-customer drill-down and makes it possible to tell a category driven by many customers from one driven by a single heavy renter. |
+| 9 | `customer_name` | `character varying(91)` — **transformed** | Derived from `customer.first_name` and `customer.last_name` | The customer's full name as a single readable value, so stakeholders are not asked to mentally join two columns. See [Field Transformation](#field-transformation). |
+| 10 | `store_id` | `smallint` | `inventory.store_id` | The branch that supplied the rented copy. Enables the report to be read per branch, which is where an inventory decision is ultimately acted on. |

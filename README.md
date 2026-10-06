@@ -322,3 +322,14 @@ This field should be transformed with a user-defined function for three reasons:
 | **Function** | `fn_customer_name(first_name character varying, last_name character varying) RETURNS character varying(91)` |
 
 The schema stores a person's name across two columns, which is correct for storage and wrong for a report: it costs the reader two columns of width and asks them to assemble the name themselves. The function combines both parts into a single field and normalizes capitalization, so the output reads the same way regardless of how a record was keyed in at the counter. A user-defined function is the right place for this because the rule — which part comes first, how the parts are separated, how casing is normalized — is a presentation decision that should be stated once and reused, not repeated inside every query that happens to need a name.
+
+#### Business Use of the Detailed Table
+
+The summary table answers the business question; the detailed table is what makes the answer usable and trustworthy.
+
+- **It makes the answer verifiable.** Any figure in the summary table is a count of rows that exist in the detailed table. A regional manager who doubts that Sports really is the top category in their city can filter the detail to that city and category and see the individual rentals behind the number. An answer that can be checked is an answer a decision can be based on.
+- **It turns a category into a buying list.** Knowing that Comedy leads in a city does not tell a buyer what to order. The detailed table carries `film_title` alongside `city` and `category_name`, so the same data shows which specific titles produced that lead — the level at which a purchase order is actually written.
+- **It localizes the decision to a branch.** `store_id` identifies the branch that supplied each rented copy, so demand concentrated in one location is not mistaken for demand across the city. Inventory is held per store, so this is the level at which a stocking change is made.
+- **It exposes supply problems the summary hides.** A category's rental count measures what customers *did* rent, not what they *wanted* to rent. Reading `rental_status` next to `category_name` and `store_id` shows where popular stock is sitting unreturned, which flags a title that should be reordered rather than simply restocked.
+- **It supports targeted marketing.** `customer_id` and `customer_name` make each rental attributable, so a campaign for a category that is strong in a city can be aimed at the customers who already rent from it instead of at the city at large.
+- **It separates breadth from volume.** A category can lead a city because many customers rent from it or because a few customers rent from it heavily. Those two situations call for opposite responses, and only the row-level detail distinguishes them.

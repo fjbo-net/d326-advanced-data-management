@@ -395,3 +395,26 @@ The summary table draws on four kinds of data. The two dimensions keep the nativ
 - `rental.return_date`, the one nullable column the report touches, never reaches the summary table as a date. It is absorbed into `outstanding_rentals`, where a missing return is counted as a `1` instead of being displayed as a blank. The transformation described in [Field Transformation](#field-transformation) is what makes that possible, and it is the reason the summary table can promise a reader that no cell in it is ever empty.
 
 A city and category pair with no rentals produces **no row**, rather than a row of zeros. The summary table reports observed demand, and a missing pair means no rental of that category was recorded in that city — which may mean there was no appetite for it or that no copies were ever stocked there. The summary table cannot tell those two apart; `store_id` in the detailed table is where that question is settled.
+
+#### Data Dictionary
+
+A single reference for the fields of the summary table, to be read alongside the field tables of the [Detailed Table](#detailed-table).
+
+| Field | PostgreSQL Type | Null | Role | Domain of Values | Example |
+|-------|-----------------|------|------|------------------|---------|
+| `city` | `character varying(50)` | `NOT NULL` | Dimension — part of the grain | Any city name present in `city` (600 in the sample database) | `Woodridge` |
+| `category_name` | `character varying(25)` | `NOT NULL` | Dimension — part of the grain | One of the 16 names in `category`: Action, Animation, Children, Classics, Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New, Sci-Fi, Sports, Travel | `Sports` |
+| `rental_count` | `integer` | `NOT NULL` | Measure — primary | `1` and above; a pair with no rentals produces no row | `42` |
+| `category_rank` | `integer` | `NOT NULL` | Measure — ordinal | `1` to `16`; `1` is the most rented category in the city, and ties share a rank | `1` |
+| `city_rental_total` | `integer` | `NOT NULL` | Measure — context | `1` and above; equals the sum of `rental_count` across the city's rows | `181` |
+| `share_of_city_rentals` | `numeric(5,2)` | `NOT NULL` | Measure — derived percentage | `0.01` to `100.00`; the city's rows sum to `100.00` | `23.20` |
+| `distinct_customers` | `integer` | `NOT NULL` | Measure — breadth | `1` to `rental_count` | `19` |
+| `outstanding_rentals` | `integer` | `NOT NULL` | Measure — availability | `0` to `rental_count` | `3` |
+| `latest_rental_date` | `date` | `NOT NULL` | Measure — recency | Any date within the range covered by `rental.rental_date` | `2007-02-14` |
+
+Notes on reading the dictionary:
+
+- **Grain.** The pair (`city`, `category_name`) identifies a row. Every other field is an aggregate measured over that pair, so no two rows of the table describe the same city and category.
+- **Role.** `Dimension` fields are the ones the report groups by and are carried straight from the source tables; `Measure` fields are produced by the aggregation and exist only in this table.
+- **Derived fields.** `share_of_city_rentals`, `category_rank` and `city_rental_total` are computed from `rental_count` within the city, so they will always reconcile with it rather than being independent figures that could drift.
+- **Example values** are illustrative of the shape and the units of each field, not output of a query.

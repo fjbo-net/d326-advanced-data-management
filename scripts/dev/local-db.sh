@@ -17,6 +17,8 @@
 #   start    Start the cluster, creating it first when needed
 #   stop     Stop the cluster
 #   status   Report whether the cluster is running
+#   restore  Load the DVD Rental dump into a new 'dvdrental' database; takes the
+#            path to the downloaded `dvdrental.zip` or to the `dvdrental.tar`
 #   psql     Open `psql` against the cluster; arguments are passed through
 #   env      Print `export` lines so a plain `psql` reaches the cluster:
 #            eval "$(scripts/dev/local-db.sh env)"
@@ -96,6 +98,54 @@ status() {
 	pg pg_ctl status -D "$DataDirectory"
 }
 
+restore() {
+	local DumpFile="${1:-}"
+
+	if [ ! -f "$DumpFile" ]; then
+		echo "ERROR: Dump file not found: '$DumpFile'" >&2
+		echo "Usage: local-db.sh restore <dvdrental.zip|dvdrental.tar>" >&2
+		exit 1
+	fi
+
+	start
+
+	local Exists
+	Exists="$(pg psql -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '$DatabaseName'")"
+	if [ "$Exists" = "1" ]; then
+		echo "ERROR: Database '$DatabaseName' already exists. To start over, run:" >&2
+		echo "  local-db.sh psql -d postgres -c 'DROP DATABASE $DatabaseName'" >&2
+		exit 1
+	fi
+
+	# The sample database is distributed as a zip holding a tar-format dump
+	local DumpPath="$DumpFile"
+	if [[ "$DumpFile" == *.zip ]]; then
+		echo "Extracting '$DumpFile'..."
+		ExtractDirectory="$(mktemp -d "$RepoRoot/.tmp/restore.XXXXXX")"
+		trap 'rm -rf "$ExtractDirectory"' EXIT
+		if ! unzip -q -o "$DumpFile" -d "$ExtractDirectory" 2>/dev/null \
+			&& ! python3 -m zipfile -e "$DumpFile" "$ExtractDirectory" 2>/dev/null; then
+			echo "ERROR: Could not extract '$DumpFile'. Install 'unzip' or 'python3', or extract the '.tar' and pass that instead" >&2
+			exit 1
+		fi
+		DumpPath="$(find "$ExtractDirectory" -name '*.tar' | head -n 1)"
+
+		if [ -z "$DumpPath" ]; then
+			echo "ERROR: No '.tar' dump found inside '$DumpFile'" >&2
+			exit 1
+		fi
+	fi
+
+	echo "Restoring '$DatabaseName' from '$DumpPath'..."
+	pg createdb "$DatabaseName"
+	if ! pg pg_restore -d "$DatabaseName" "$DumpPath"; then
+		pg dropdb "$DatabaseName"
+		echo "ERROR: Restore failed; database '$DatabaseName' was removed" >&2
+		exit 1
+	fi
+	echo "SUCCESS: Database '$DatabaseName' restored"
+}
+
 open_psql() {
 	PGDATABASE="${PGDATABASE:-$DatabaseName}" pg psql "$@"
 }
@@ -117,6 +167,7 @@ case "$Command" in
 	start) start ;;
 	stop) stop ;;
 	status) status ;;
+	restore) restore "$@" ;;
 	psql) open_psql "$@" ;;
 	env) print_env ;;
 	*)

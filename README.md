@@ -333,6 +333,39 @@ This field should be transformed with a user-defined function for three reasons:
 
 The schema stores a person's name across two columns, which is correct for storage and wrong for a report: it costs the reader two columns of width and asks them to assemble the name themselves. The function combines both parts into a single field and normalizes capitalization, so the output reads the same way regardless of how a record was keyed in at the counter. A user-defined function is the right place for this because the rule — which part comes first, how the parts are separated, how casing is normalized — is a presentation decision that should be stated once and reused, not repeated inside every query that happens to need a name.
 
+#### Implementation
+
+Both functions are created by [`scripts/sql/create-transform-function.sql`](scripts/sql/create-transform-function.sql), which is run for you by [`scripts\setup-db.bat`](#database-provisioning). The script uses `CREATE OR REPLACE FUNCTION`, so running it again updates the definitions instead of failing.
+
+Each function is `IMMUTABLE`: given the same input it always returns the same output and reads nothing from the database, so PostgreSQL can pre-evaluate calls with constant arguments and the functions can be used in an index. Both are written in `LANGUAGE sql` with a plain `SELECT` body, which PostgreSQL can inline into the calling query.
+
+| Call | Result | Behaviour shown |
+|------|--------|-----------------|
+| `fn_rental_status(NULL)` | `Outstanding` | No return recorded, so the copy is still out. |
+| `fn_rental_status('2005-05-26 22:04:30')` | `Returned` | Any timestamp means the copy came back. |
+| `fn_customer_name('MARY', 'SMITH')` | `Mary Smith` | Both parts are combined and the capitalization normalized. |
+| `fn_customer_name('  mary ', NULL)` | `Mary` | Surrounding whitespace is trimmed and a missing part is left out. |
+| `fn_customer_name(NULL, 'SMITH')` | `Smith` | A missing first name leaves no dangling separator. |
+| `fn_customer_name('', NULL)` | `NULL` | When there is no name at all the result is `NULL` instead of an empty string. |
+
+`fn_rental_status` is deliberately **not** declared `STRICT`. A strict function returns `NULL` without running whenever any argument is `NULL`, and `NULL` is exactly the input that has to produce `Outstanding`.
+
+The functions are called from the `SELECT` list of the detailed table:
+
+``` sql
+SELECT
+    r.rental_id,
+    r.rental_date,
+    fn_rental_status(r.return_date) AS rental_status,
+    fn_customer_name(c.first_name, c.last_name) AS customer_name
+
+FROM rental AS r
+    INNER JOIN customer AS c
+        ON c.customer_id = r.customer_id
+
+LIMIT 10;
+```
+
 #### Business Use of the Detailed Table
 
 The summary table answers the business question; the detailed table is what makes the answer usable and trustworthy.

@@ -20,6 +20,33 @@ Or use the following command to setup the provisioned lab:
 CURL -L -o remote-setup.bat https://raw.githubusercontent.com/fjbo-net/d326-advanced-data-management/refs/heads/main/scripts/dev/remote-setup.bat && remote-setup.bat
 ```
 
+### Portable PostgreSQL
+
+To work without installing PostgreSQL, `scripts/dev/local-db.sh` runs a throwaway cluster inside the repository. It works on Linux, macOS and Termux, and needs the PostgreSQL command-line tools (`initdb`, `pg_ctl`, `psql`) on the `PATH`, or in the directory named by the `PG_BIN` environment variable.
+
+``` bash
+# Create the cluster (first run only) and start it
+scripts/dev/local-db.sh start
+
+# Load the DVD Rental Sample Database from the downloaded `dvdrental.zip`
+scripts/dev/local-db.sh restore ~/Downloads/dvdrental.zip
+
+# Open `psql` on the `dvdrental` database
+scripts/dev/local-db.sh psql
+
+# Stop the cluster
+scripts/dev/local-db.sh stop
+```
+
+The cluster is stored in `.tmp/`, which Git ignores, so stopping the cluster, deleting `.tmp/pgdata` and running `start` again resets it. It accepts connections only through a Unix socket in `.tmp/pgsocket`, as the `postgres` user without a password, and never opens a network port.
+
+To use the `psql` commands from [PostgreSQL Command-Line Interface](#postgresql-command-line-interface) as written, run the following in the shell first:
+``` bash
+eval "$(scripts/dev/local-db.sh env)"
+```
+
+The cluster runs the version of PostgreSQL that the installed tools belong to, while the lab runs PostgreSQL 13. Check anything version-sensitive in the lab before submitting.
+
 
 ## PostgreSQL
 

@@ -19,6 +19,9 @@
 #   status   Report whether the cluster is running
 #   restore  Load the DVD Rental dump into a new 'dvdrental' database; takes the
 #            path to the downloaded `dvdrental.zip` or to the `dvdrental.tar`
+#   reset    Delete the cluster and start a new, empty one; given a dump, as for
+#            `restore`, also load it, which returns 'dvdrental' to its original
+#            state
 #   psql     Open `psql` against the cluster; arguments are passed through
 #   env      Print `export` lines so a plain `psql` reaches the cluster:
 #            eval "$(scripts/dev/local-db.sh env)"
@@ -146,6 +149,31 @@ restore() {
 	echo "SUCCESS: Database '$DatabaseName' restored"
 }
 
+reset_cluster() {
+	local DumpFile="${1:-}"
+
+	# Check before deleting anything, so a mistyped path cannot cost the data
+	if [ -n "$DumpFile" ] && [ ! -f "$DumpFile" ]; then
+		echo "ERROR: Dump file not found: '$DumpFile'" >&2
+		exit 1
+	fi
+
+	stop
+
+	# Only a real cluster is deleted, never an arbitrary directory
+	if [ -f "$DataDirectory/PG_VERSION" ]; then
+		echo "Deleting cluster '$DataDirectory'..."
+		rm -rf "$DataDirectory"
+	fi
+	rm -f "$LogFile"
+
+	if [ -n "$DumpFile" ]; then
+		restore "$DumpFile"
+	else
+		start
+	fi
+}
+
 open_psql() {
 	PGDATABASE="${PGDATABASE:-$DatabaseName}" pg psql "$@"
 }
@@ -168,6 +196,7 @@ case "$Command" in
 	stop) stop ;;
 	status) status ;;
 	restore) restore "$@" ;;
+	reset) reset_cluster "$@" ;;
 	psql) open_psql "$@" ;;
 	env) print_env ;;
 	*)

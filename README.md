@@ -36,9 +36,12 @@ scripts/dev/local-db.sh psql
 
 # Stop the cluster
 scripts/dev/local-db.sh stop
+
+# Discard every change and load the DVD Rental Sample Database again
+scripts/dev/local-db.sh reset ~/Downloads/dvdrental.zip
 ```
 
-The cluster is stored in `.tmp/`, which Git ignores, so stopping the cluster, deleting `.tmp/pgdata` and running `start` again resets it. It accepts connections only through a Unix socket in `.tmp/pgsocket`, as the `postgres` user without a password, and never opens a network port.
+The cluster is stored in `.tmp/`, which Git ignores. `reset` deletes the whole cluster, including any tables and functions created in it, and starts a new one; without a path to the dump it leaves the new cluster empty. The cluster accepts connections only through a Unix socket in `.tmp/pgsocket`, as the `postgres` user without a password, and never opens a network port.
 
 To use the `psql` commands from [PostgreSQL Command-Line Interface](#postgresql-command-line-interface) as written, run the following in the shell first:
 ``` bash

@@ -211,7 +211,7 @@ psql -U postgres -d dvdrental -f script.sql
 ```
 
 ### Database Provisioning
-The database objects the report depends on (currently the data transformation functions) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
+The database objects the report depends on (currently the data transformation functions and the detailed table) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
 
 To provision the database:
 ``` batch
@@ -550,3 +550,38 @@ To run the tests:
 
 
 The script was executed in the Labs on Demand Assessment Environment against the DVD Rental database, and every test reported `PASS`. Both functions therefore produce the expected transformations for literal inputs, for every row of the dataset, and when called from the query that populates the detailed table.
+
+
+## Report Tables
+
+The tables that hold the sections of the business report.
+
+### Detailed Table
+
+The detailed table is created by [`./scripts/sql/create-detailed-table.sql`](./scripts/sql/create-detailed-table.sql), which is executed as part of the [database provisioning](#database-provisioning) performed by `.\scripts\setup-db.bat`, after the [transformation functions](#transformation-functions) are created. The script drops and recreates the table `report_detailed` inside a transaction, so running it again rebuilds the definition instead of failing. The table is created empty; its contents are refreshed later by the stored procedure of the report.
+
+| Field | Data Type | Nullable |
+|-------|-----------|----------|
+| `rental_id` | `integer` | No (primary key) |
+| `rental_date` | `timestamp without time zone` | No |
+| `return_date` | `timestamp without time zone` | **Yes** |
+| `rental_status` | `character varying(20)` | No |
+| `city` | `character varying(50)` | No |
+| `category_name` | `character varying(25)` | No |
+| `film_title` | `character varying(255)` | No |
+| `customer_id` | `smallint` | No |
+| `customer_name` | `character varying(91)` | No |
+| `store_id` | `smallint` | No |
+
+- The data types are those documented under [Detailed Table](#detailed-table).
+- `return_date` is the only field that allows `NULL`: it is empty while a copy has not been returned.
+- `rental_id` is the primary key, so each rental event appears in the table once.
+- `rental_status` is limited to the output of `fn_rental_status` by `CHECK (rental_status IN ('Returned', 'Outstanding'))`. It and `customer_name` receive the output of `fn_rental_status` and `fn_customer_name`, and their types match the return types of those functions.
+- There are no foreign keys to the source tables, since the report table is a denormalized snapshot of them.
+- Every table and column carries a `COMMENT` describing its business purpose, visible with `\d+ report_detailed`.
+
+To verify the definition, provision the database with [`.\scripts\setup-db.bat`](#database-provisioning) and describe the table:
+
+``` batch
+psql -U postgres -d dvdrental -c "\d report_detailed"
+```

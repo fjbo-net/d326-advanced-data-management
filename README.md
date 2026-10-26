@@ -211,7 +211,7 @@ psql -U postgres -d dvdrental -f script.sql
 ```
 
 ### Database Provisioning
-The database objects the report depends on (currently the data transformation functions and the detailed table) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
+The database objects the report depends on (currently the data transformation functions, the detailed table and the summary table) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
 
 To provision the database:
 ``` batch
@@ -613,3 +613,32 @@ To run the tests:
 		```
 
 0. Review the output: every check reports `PASS` or `FAIL` in its `result` column. All of them should report `PASS`.
+
+### Summary Table
+
+The summary table is created by [`./scripts/sql/create-summary-table.sql`](./scripts/sql/create-summary-table.sql), which is executed by `.\scripts\setup-db.bat` after the [detailed table](#detailed-table-1) is created. The script drops and recreates the table `report_summary` inside a transaction, so running it again rebuilds the definition instead of failing. The table is created empty; its contents are refreshed later by the stored procedure of the report.
+
+| Field | Data Type | Nullable |
+|-------|-----------|----------|
+| `city` | `character varying(50)` | No (primary key) |
+| `category_name` | `character varying(25)` | No (primary key) |
+| `rental_count` | `integer` | No |
+| `category_rank` | `integer` | No |
+| `city_rental_total` | `integer` | No |
+| `share_of_city_rentals` | `numeric(5,2)` | No |
+| `distinct_customers` | `integer` | No |
+| `outstanding_rentals` | `integer` | No |
+| `latest_rental_date` | `date` | No |
+
+- The data types are those documented under [Summary Table](#summary-table).
+- Every field is `NOT NULL`.
+- The primary key is the grain `(city, category_name)`, so each city and category appears in the table once.
+- Check constraints enforce the domains of the data dictionary: `rental_count >= 1`, `category_rank >= 1`, `city_rental_total >= rental_count`, `share_of_city_rentals BETWEEN 0 AND 100`, `distinct_customers BETWEEN 1 AND rental_count` and `outstanding_rentals BETWEEN 0 AND rental_count`.
+- There are no foreign keys to the source tables, since the report table is a denormalized snapshot of them.
+- Every table and column carries a `COMMENT` describing its business purpose, visible with `\d+ report_summary`.
+
+To verify the definition, provision the database with [`.\scripts\setup-db.bat`](#database-provisioning) and describe the table:
+
+``` batch
+psql -U postgres -d dvdrental -c "\d report_summary"
+```

@@ -2,13 +2,42 @@
 Project for the Performance Assessment for the course D326 Advanced Data Management.
 
 
-## Set Up
+## Getting Started
+
+### Project Topology
+
+High-level overview of the project file structure. Please note that only key or relevant files are listed below. Not all files are listed.
+
+- **d326-advanced-data-management/**
+
+	- [data-analysis/](./data-analysis/)
+
+		Contains deliverables and resources for Task 1.
+
+		- `task-1-overview.md`
+
+			Markdown version of the Task 1 Overview.
+
+	- [scripts/](/scripts/)
+
+		Contains tools and scripts for development and aid on the project.
+
+		- [dev/](./scripts/dev/)
+
+			Contains development scripts. See [Developer Set Up](#developer-set-up) for more details.
+
+	- `README.md`
+
+		This file. Contains information about the project. 
+
+
+### Set Up
 
 Use the following steps to configure the pre-requisites for the project:
 1. [Install PostgreSQL](https://neon.com/postgresql/postgresql-getting-started/install-postgresql)
 0. Load the [DVD Rental Sample Database](https://neon.tech/unify?a=41263d5e-7865-4b0c-abb2-9efabc408393&n=postgresqltutorial/dvdrental.zip) into PostgreSQL
 
-### Developer Set Up
+#### Developer Set Up
 
 To configure a provisioned lab:
 1. Install Visual Studio Code

@@ -1,0 +1,1196 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <title>Task Overview - WGU Performance Assessment</title>
+</head>
+
+<body>
+    <main><router-outlet></router-outlet><app-task-overview-page><app-main-sub-nav>
+            </app-main-sub-nav>
+            <div>
+                <div><!----></div>
+            </div>
+            <div><app-task-header>
+                    <header>
+                        <div>
+                            <div>
+                                <h1><span>CSN1 — CSN1 Task 1: Data Analysis</span><!----><!----> </h1>
+                                <div>
+                                    <div>
+                                        <p><span>Advanced Data Management — D326</span></p>
+                                        <p><span>PRFA — CSN1</span></p>
+                                    </div>
+                                </div><!---->
+                            </div>
+                        </div>
+                    </header><!---->
+                </app-task-header>
+            </div><app-activation-message><!----><!----></app-activation-message>
+            <div><app-task-overview>
+                    <div>
+                        <div id="content"><!---->
+                            <div>
+                                <section>
+                                    <div><a id="taskOverviewCompetencies"></a>
+                                        <h2>Competencies </h2>
+                                        <hr>
+                                    </div>
+                                    <div>
+                                        <p><span>4037.5.1</span> : <span>Writes Structured Query Language (SQL)
+                                                Statements</span></p>
+                                        <p><span>The learner writes complex Structured Query Language (SQL) statements
+                                                for
+                                                data analysis and manipulation</span></p>
+                                    </div>
+                                    <div>
+                                        <p><span>4037.5.2</span> : <span>Configures Automated Tasks</span></p>
+                                        <p><span>The learner configures data extraction, transformation, and loading
+                                                tasks
+                                                for automated data integration</span></p>
+                                    </div><!---->
+                                </section><!---->
+                                <section>
+                                    <div><a id="taskOverviewIntroduction"></a>
+                                        <h2>Introduction </h2>
+                                        <hr>
+                                    </div>
+                                    <div>
+                                        <p>Data analysts frequently transform data within a database so that it can be
+                                            used
+                                            for analysis and so that the data will be easier for nontechnical users to
+                                            use
+                                            and understand. You will emulate such a process in this task by choosing
+                                            your
+                                            own business question to analyze, creating tables and queries to use as a
+                                            business report, and streamlining your analysis by writing your own SQL
+                                            functions, triggers, and stored procedures.</p>
+                                        <p><br></p>
+                                        <p>This task defines a report as a collection of data that answers a real-world
+                                            business question. Your report will have two distinct sections (SQL tables
+                                            that
+                                            you will create) that differ in the granularity of the data they present and
+                                            how
+                                            directly they support the answering of the business question you choose. The
+                                            detailed table should contain all data that informs the answer to the
+                                            question
+                                            at a very granular level, and the summary table should contain aggregated
+                                            data
+                                            that provide a direct answer to the business question.</p>
+                                    </div>
+                                </section>
+                                <section>
+                                    <div><a id="taskOverviewRequirements"></a>
+                                        <h2>Requirements </h2>
+                                        <hr>
+                                    </div>
+                                    <div>
+                                        <p><span id="isPasted">Your submission must represent your original work and
+                                                understanding of the course material. Most performance assessment
+                                                submissions are automatically scanned through the WGU similarity
+                                                checker.
+                                                Students are strongly encouraged to wait for the similarity report to
+                                                generate after uploading their work and then review it to ensure
+                                                Academic
+                                                Authenticity guidelines are met before submitting the file for
+                                                evaluation.
+                                                See&nbsp;<a
+                                                    href="https://cm.wgu.edu/t5/Frequently-Asked-Questions/Understanding-Similarity-Reports/ta-p/252">Understanding
+                                                    Similarity Reports</a> for more information. &nbsp;<br><br>
+                                                <h3>Grammarly Note:</h3>&nbsp;<br>Professional Communication will be
+                                                automatically assessed through Grammarly for Education in most
+                                                performance
+                                                assessments before a student submits work for evaluation. Students are
+                                                strongly encouraged to review the Grammarly for Education feedback prior
+                                                to
+                                                submitting work for evaluation, as the overall submission will not pass
+                                                without this aspect passing. See&nbsp;<a
+                                                    href="https://cm.wgu.edu/t5/Academic-Coaching-Center/Use-Grammarly-for-Education-Effectively/ta-p/52276">Use
+                                                    Grammarly for Education Effectively</a> for more information.
+                                                &nbsp;<br><br>
+                                                <h3>Microsoft Files Note:&nbsp;</h3><br>Write your paper in Microsoft
+                                                Word
+                                                (.doc or .docx) unless another Microsoft product, or pdf, is specified
+                                                in
+                                                the task directions. Tasks may not be submitted as cloud links, such as
+                                                links to Google Docs, Google Slides, OneDrive, etc.  All supporting
+                                                documentation, such as screenshots and proof of experience, should be
+                                                collected in a pdf file and submitted separately from the main file. For
+                                                more information, please see&nbsp;<a
+                                                    href="https://cm.wgu.edu/t5/WGU-Student-Policy-Handbook/Computer-System-and-Technology-Requirements/ta-p/78">Computer
+                                                    System and Technology Requirements.</a> &nbsp;<br>
+                                            </span><em><br>You must use the rubric to direct the creation of your
+                                                submission
+                                                because it provides detailed criteria that will be used to evaluate your
+                                                work. Each requirement below may be evaluated by more than one rubric
+                                                aspect. The rubric aspect titles may contain hyperlinks to relevant
+                                                portions
+                                                of the course.&nbsp;<br><br>To work on this task, use the “Labs on
+                                                Demand
+                                                Assessment Environment and DVD Database” found in the Web Links section.
+                                                In
+                                                this environment, you will be able to write and test your PostgreSQL
+                                                code
+                                                and access the database to complete this task.&nbsp;</em></p>
+                                        <p><br></p>
+                                        <p>Plan for and compose the sections of a real-world business report that can be
+                                            created from the "Labs on Demand Assessment Environment and DVD Database"
+                                            web
+                                            link, and demonstrate the functionality of the supporting SQL code by doing
+                                            the
+                                            following:</p>
+                                        <p><br></p>
+                                        <p>A. &nbsp;Summarize <strong>one&nbsp;</strong>real-world written business
+                                            report
+                                            that can be created from the DVD Dataset from the “Labs on Demand Assessment
+                                            Environment and DVD Database” attachment.&nbsp;</p>
+                                        <p>1. &nbsp;Identify the specific fields that will be included in the detailed
+                                            table
+                                            and the summary table of the report.</p>
+                                        <p>2. &nbsp;Describe the types of data fields used for the report.</p>
+                                        <p>3. &nbsp;Identify<em>&nbsp;at least</em> <strong>two&nbsp;</strong>specific
+                                            tables from the given dataset that will provide the data necessary for the
+                                            detailed table section and the summary table section of the report.</p>
+                                        <p>4. &nbsp;Identify <em>at least</em> <strong>one&nbsp;</strong>field in the
+                                            detailed table section that will require a custom transformation with a
+                                            user-defined function and explain why it should be transformed (e.g., you
+                                            might
+                                            translate a field with a value of N to No and Y to Yes).</p>
+                                        <p>5. &nbsp;Explain the different business uses of the detailed table section
+                                            and
+                                            the summary table section of the report.&nbsp;</p>
+                                        <p>6. &nbsp;Explain how frequently your report should be refreshed to remain
+                                            relevant to stakeholders.<br>&nbsp;</p>
+                                        <p>B. &nbsp;Provide original code for function(s) in text format that perform
+                                            the
+                                            transformation(s) you identified in part A4.<br>&nbsp;</p>
+                                        <p>C. &nbsp;Provide original SQL code in a text format that creates the detailed
+                                            and
+                                            summary tables to hold your report table sections.<br>&nbsp;</p>
+                                        <p>D. &nbsp;Provide an original SQL query in a text format that will extract the
+                                            raw
+                                            data needed for the detailed section of your report from the source
+                                            database.<br>&nbsp;</p>
+                                        <p>E. &nbsp;Provide original SQL code in a text format that creates a trigger on
+                                            the
+                                            detailed table of the report that will continually update the summary table
+                                            as
+                                            data is added to the detailed table.<br>&nbsp;</p>
+                                        <p>F. &nbsp;Provide an original stored procedure in a text format that can be
+                                            used
+                                            to refresh the data in <em>both&nbsp;</em>the detailed table and summary
+                                            table.
+                                            The procedure should clear the contents of the detailed table and summary
+                                            table
+                                            and perform the raw data extraction from part D.</p>
+                                        <p>1. &nbsp;Identify a relevant job scheduling tool that can be used to automate
+                                            the
+                                            stored procedure.<br>&nbsp;</p>
+                                        <p>G. &nbsp;Provide a Panopto video recording that includes the presenter and a
+                                            vocalized demonstration of the functionality of the code used for the
+                                            analysis.<br>&nbsp; </p>
+                                        <p><em>Note: For instructions on how to access and use Panopto, use the "Panopto
+                                                How-To Videos" web link provided below. To access Panopto's website,
+                                                navigate to the web link titled "Panopto Access," and then choose to log
+                                                in
+                                                using the “WGU” option. If prompted, log in using your WGU student
+                                                portal
+                                                credentials, and then it will forward you to Panopto’s
+                                                website.</em><br><br>
+                                        </p>
+                                        <p><em>To submit your recording, upload it to the Panopto drop box titled
+                                                “Advanced
+                                                Data Management D191 | D326 (Student Creators) [assignments].” Once the
+                                                recording has been uploaded and processed in Panopto's system, retrieve
+                                                the
+                                                URL of the recording from Panopto and copy and paste it into the Links
+                                                option. Upload the remaining task requirements using the Attachments
+                                                option.</em><br>&nbsp; </p>
+                                        <p>H. &nbsp;Acknowledge all utilized sources, including any sources of
+                                            third-party
+                                            code, using in-text citations and references. If no sources are used,
+                                            clearly
+                                            declare that no sources were used to support your submission.<br>&nbsp;</p>
+                                        <p>I. &nbsp;Demonstrate professional communication in the content and
+                                            presentation
+                                            of your submission.<br>&nbsp;</p>
+                                    </div>
+                                    <div>
+                                        <h2>File Restrictions</h2>
+                                    </div>
+                                    <div><span>File name may contain only letters, numbers, spaces, and these symbols: !
+                                            - _
+                                            . * ' ( )</span><br><span>File size limit: 200 MB</span><br><span>File types
+                                            allowed: doc, docx, rtf, xls, xlsx, ppt, pptx, odt, pdf, csv, txt, qt, mov,
+                                            mpg,
+                                            avi, mp3, wav, mp4, wma, flv, asf, mpeg, wmv, m4v, svg, tif, tiff, jpeg,
+                                            jpg,
+                                            gif, png, zip, rar, tar, 7z</span><br></div>
+                                </section>
+                                <section>
+                                    <div><a id="taskOverviewRubric"></a>
+                                        <h2>Rubric</h2>
+                                        <hr>
+                                    </div>
+                                    <div><app-rubric-grid>
+                                            <div>
+                                                <h4> <span>A</span><span>:</span><!----><!----><span><span>Business
+                                                            Report</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A summary of 1 real-world
+                                                                                        business
+                                                                                        report created from the dataset
+                                                                                        is
+                                                                                        not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission summarizes the 1
+                                                                                        real-world written business
+                                                                                        report
+                                                                                        created from the dataset, but it
+                                                                                        is
+                                                                                        either incomplete or
+                                                                                        inaccurate.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The submission accurately and
+                                                                                        completely summarizes 1
+                                                                                        real-world
+                                                                                        written business report created
+                                                                                        from
+                                                                                        the dataset.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A1</span><span>:</span><!----><!----><span><span>Specific
+                                                            Fields</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A submission identifying 1 or
+                                                                                        more
+                                                                                        specific fields that will be
+                                                                                        included in the detailed table
+                                                                                        and
+                                                                                        summary table of the report is
+                                                                                        not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission does not
+                                                                                        identify 1
+                                                                                        or more of the specific fields
+                                                                                        that
+                                                                                        will be included in the detailed
+                                                                                        table and summary table of the
+                                                                                        report.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The submission identifies
+                                                                                        <em>all</em> of the specific
+                                                                                        fields
+                                                                                        that will be included in the
+                                                                                        detailed table and summary table
+                                                                                        of
+                                                                                        the report.</span> </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A2</span><span>:</span><!----><!----><span><span>Types of
+                                                            Data</span></span><!----> </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A description of the data
+                                                                                        fields to
+                                                                                        be used in the report is not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission describing the
+                                                                                        types
+                                                                                        of data fields to be used in the
+                                                                                        report is either inaccurate or
+                                                                                        incomplete.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The submission accurately and
+                                                                                        completely describes the types
+                                                                                        of
+                                                                                        data fields that will be used in
+                                                                                        the
+                                                                                        report.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A3</span><span>:</span><!----><!----><span><span>Specific
+                                                            Tables</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A submission identifying <em>at
+                                                                                            least</em> 2 specific tables
+                                                                                        from the given dataset is not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission identifies
+                                                                                        <em>at
+                                                                                            least</em> 2 of the tables
+                                                                                        from
+                                                                                        the given data set, but 1 or
+                                                                                        both of
+                                                                                        the identified tables will not
+                                                                                        provide the data necessary for
+                                                                                        the
+                                                                                        detailed table section and
+                                                                                        summary
+                                                                                        table section of the
+                                                                                        report.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The submission identifies
+                                                                                        <em>at
+                                                                                            least</em> 2 tables from the
+                                                                                        given dataset that provide the
+                                                                                        data
+                                                                                        necessary for the detailed table
+                                                                                        section and summary table
+                                                                                        section of
+                                                                                        the report.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A4</span><span>:</span><!----><!----><span><span>Field
+                                                            Transformation</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A submission identifying <em>at
+                                                                                            least</em> 1 field in the
+                                                                                        detailed table section of the
+                                                                                        report
+                                                                                        that will require a custom
+                                                                                        transformation is not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission identifies 1
+                                                                                        field
+                                                                                        in the detailed table section of
+                                                                                        the
+                                                                                        report but does not explain why
+                                                                                        the
+                                                                                        field should be transformed with
+                                                                                        a
+                                                                                        user-defined function.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The submission identifies at
+                                                                                        least
+                                                                                        1 field in the detailed table
+                                                                                        section of the report that will
+                                                                                        require a custom transformation
+                                                                                        and
+                                                                                        explains why it should be
+                                                                                        transformed with a user-defined
+                                                                                        function.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A5</span><span>:</span><!----><!----><span><span>Business
+                                                            Uses</span></span><!----> </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>An explanation of the business
+                                                                                        uses
+                                                                                        of the summary and detailed
+                                                                                        table
+                                                                                        sections of the report is not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The submission is missing
+                                                                                        either
+                                                                                        the explanation of the detailed
+                                                                                        table section or the explanation
+                                                                                        of
+                                                                                        the summary table section. Or
+                                                                                        the
+                                                                                        explanation did not accurately
+                                                                                        and
+                                                                                        logically explain how the
+                                                                                        sections
+                                                                                        can be used to improve
+                                                                                        business.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The business uses of the
+                                                                                        summary
+                                                                                        and detailed table sections of
+                                                                                        the
+                                                                                        report accurately and logically
+                                                                                        explains how they can be used to
+                                                                                        improve business.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>A6</span><span>:</span><!----><!----><span><span>Report
+                                                            Freshness</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>An explanation of how
+                                                                                        frequently
+                                                                                        the report should be refreshed
+                                                                                        to
+                                                                                        remain relevant to stakeholders
+                                                                                        is
+                                                                                        not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The explanation of how
+                                                                                        frequently
+                                                                                        the report should be refreshed
+                                                                                        has
+                                                                                        an unreasonable frequency, or
+                                                                                        the
+                                                                                        explanation is inadequate or
+                                                                                        illogical.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The explanation of how
+                                                                                        frequently
+                                                                                        the report should be refreshed
+                                                                                        to
+                                                                                        remain relevant to stakeholders
+                                                                                        has
+                                                                                        a reasonable frequency. The
+                                                                                        explanation is adequate and
+                                                                                        logical.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>B</span><span>:</span><!----><!----><span><span>Functions</span></span><!---->
+                                                </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The code for the function(s)
+                                                                                        that
+                                                                                        perform the transformation(s)
+                                                                                        identified in part A4 is not
+                                                                                        provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The code for the function(s)
+                                                                                        that
+                                                                                        perform the transformation(s)
+                                                                                        identified in part A4
+                                                                                        <em>either</em> did not result
+                                                                                        in
+                                                                                        the expected transformations, or
+                                                                                        1
+                                                                                        or more of the previously
+                                                                                        identified
+                                                                                        functions is not included in the
+                                                                                        submission, or the code is not
+                                                                                        in
+                                                                                        text format.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The text format code for the
+                                                                                        function(s) that perform the
+                                                                                        transformation(s) identified in
+                                                                                        part
+                                                                                        A4 produced the expected
+                                                                                        transformations and <em>all</em>
+                                                                                        previously identified functions
+                                                                                        are
+                                                                                        included in the
+                                                                                        submission.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>C</span><span>:</span><!----><!----><span><span>Creating
+                                                            Tables</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The SQL code that creates the
+                                                                                        tables to hold the detailed and
+                                                                                        summary tables report sections
+                                                                                        is
+                                                                                        not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The SQL code that creates the
+                                                                                        detailed and summary tables to
+                                                                                        hold
+                                                                                        the report sections is
+                                                                                        incorrect,
+                                                                                        incomplete, or not in a text
+                                                                                        format.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The SQL code that creates the
+                                                                                        detailed and summary tables is
+                                                                                        correct, complete, and in a text
+                                                                                        format.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>D</span><span>:</span><!----><!----><span><span>SQL
+                                                            Query</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The SQL query to extract raw
+                                                                                        data
+                                                                                        is not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The SQL query provided does not
+                                                                                        correctly query the raw data
+                                                                                        needed
+                                                                                        for the detailed section of the
+                                                                                        report from the source database
+                                                                                        or
+                                                                                        is not in a text format.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The text-format SQL query
+                                                                                        provided
+                                                                                        correctly queries the raw data
+                                                                                        needed for the detailed section
+                                                                                        of
+                                                                                        the report from the source
+                                                                                        database.
+                                                                                    </span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>E</span><span>:</span><!----><!----><span><span>Triggers</span></span><!---->
+                                                </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The SQL code that creates a
+                                                                                        trigger
+                                                                                        on the detailed table of the
+                                                                                        report
+                                                                                        is not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The provided SQL code does not
+                                                                                        create a trigger or the trigger
+                                                                                        does
+                                                                                        not continually update the
+                                                                                        summary
+                                                                                        table as data is added to the
+                                                                                        detailed table, or the code is
+                                                                                        not
+                                                                                        in text format.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The SQL code in text format
+                                                                                        successfully creates a trigger
+                                                                                        on
+                                                                                        the detailed table of the report
+                                                                                        that will continually update the
+                                                                                        summary table as data is added
+                                                                                        to
+                                                                                        the detailed table.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>F</span><span>:</span><!----><!----><span><span>Stored
+                                                            Procedures</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A stored procedure to refresh
+                                                                                        the
+                                                                                        data is not provided.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>The stored procedure provided
+                                                                                        does
+                                                                                        not refresh the data in 1 or
+                                                                                        <em>both</em> of the detailed
+                                                                                        table
+                                                                                        and summary table, or it does
+                                                                                        not
+                                                                                        clear the contents of the
+                                                                                        detailed
+                                                                                        table and summary table, or it
+                                                                                        does
+                                                                                        not perform the raw data
+                                                                                        extraction
+                                                                                        from part D. Or the submission
+                                                                                        is
+                                                                                        not in text format.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>The stored procedure in a text
+                                                                                        format provided refreshes the
+                                                                                        data
+                                                                                        in <em>both</em> the detailed
+                                                                                        table
+                                                                                        and summary table, and it can
+                                                                                        clear
+                                                                                        the contents of the detailed
+                                                                                        table
+                                                                                        and summary table and perform
+                                                                                        the
+                                                                                        raw data extraction from part
+                                                                                        D.</span> </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>F1</span><span>:</span><!----><!----><span><span>Job
+                                                            Scheduling
+                                                            Tool</span></span><!----></h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>A tool is not
+                                                                                        identified.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>A tool is identified but cannot
+                                                                                        be
+                                                                                        used to automate the stored
+                                                                                        procedure.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>A relevant job scheduling tool
+                                                                                        that
+                                                                                        can be used to automate the
+                                                                                        stored
+                                                                                        procedure is identified.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>G: Panopto
+                                                        Video</span><span>:</span><!----><!----><span><span></span></span><!---->
+                                                </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The submission does not provide
+                                                                                        a
+                                                                                        Panopto video recording.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>A Panopto video recording is
+                                                                                        provided but does not include a
+                                                                                        demonstration of the
+                                                                                        functionality
+                                                                                        of the code used for the
+                                                                                        analysis or
+                                                                                        the video does not capture both
+                                                                                        the
+                                                                                        presenter and the vocalized
+                                                                                        presentation of the functioning
+                                                                                        code
+                                                                                        in a Panopto video
+                                                                                        recording.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>A Panopto video recording is
+                                                                                        provided that includes a
+                                                                                        demonstration of the
+                                                                                        functionality
+                                                                                        of the code used for the
+                                                                                        analysis.
+                                                                                        For the duration of the
+                                                                                        presentation, the video captures
+                                                                                        both the presenter and the
+                                                                                        vocalized
+                                                                                        presentation of the functioning
+                                                                                        code
+                                                                                        in a Panopto video
+                                                                                        recording.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>H</span><span>:</span><!----><a
+                                                        title="https://lrps.wgu.edu/provision/71484321"
+                                                        href="https://lrps.wgu.edu/provision/71484321"><span>Sources</span><span></span></a><!----><!---->
+                                                </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>The submission does not include
+                                                                                        <em>both</em> in-text citations
+                                                                                        and
+                                                                                        a reference list for any sources
+                                                                                        that are quoted, paraphrased, or
+                                                                                        summarized.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>Sources are utilized in the
+                                                                                        submission but are either not
+                                                                                        acknowledged in-text or not
+                                                                                        included
+                                                                                        in a reference list, or the
+                                                                                        sources
+                                                                                        cited are not reliable.</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>All utilized sources are
+                                                                                        reliable
+                                                                                        and acknowledged using in-text
+                                                                                        citations and references, or the
+                                                                                        submission clearly identifies
+                                                                                        that
+                                                                                        no sources were used.</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h4> <span>I</span><span>:</span><!----><a
+                                                        title="https://lrps.wgu.edu/provision/27641407"
+                                                        href="https://lrps.wgu.edu/provision/27641407"><span>Professional
+                                                            Communication</span><span></span></a><!----><!----> </h4>
+                                                <div>
+                                                    <div>
+                                                        <table summary="The Task Rubric Table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Not Evident</span></b></p>
+                                                                                <p><span>This submission includes
+                                                                                        pervasive
+                                                                                        errors in professional
+                                                                                        communication
+                                                                                        related to grammar, sentence
+                                                                                        fluency, contextual spelling, or
+                                                                                        punctuation, negatively
+                                                                                        impacting
+                                                                                        the professional quality and
+                                                                                        clarity
+                                                                                        of the writing. Specific errors
+                                                                                        have
+                                                                                        been identified by Grammarly for
+                                                                                        Education under the Correctness
+                                                                                        category.  &nbsp;</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Approaching
+                                                                                            Competence</span></b></p>
+                                                                                <p><span>This submission includes
+                                                                                        substantial errors in
+                                                                                        professional
+                                                                                        communication related to
+                                                                                        grammar,
+                                                                                        sentence fluency, contextual
+                                                                                        spelling, or punctuation.
+                                                                                        Specific
+                                                                                        errors have been identified by
+                                                                                        Grammarly for Education under
+                                                                                        the
+                                                                                        Correctness
+                                                                                        category.  &nbsp;</span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </app-rubric-result></td>
+                                                                    <td> <app-rubric-result>
+                                                                            <div><!---->
+                                                                                <div> </div><!---->
+                                                                                <p> <b><span>Competent</span></b> </p>
+                                                                                <p><span>This submission includes
+                                                                                        satisfactory use of grammar,
+                                                                                        sentence fluency, contextual
+                                                                                        spelling, and punctuation, which
+                                                                                        promote accurate interpretation
+                                                                                        and
+                                                                                        understanding. &nbsp;</span></p>
+                                                                            </div>
+                                                                        </app-rubric-result></td><!---->
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div><!---->
+                                        </app-rubric-grid><!----></div>
+                                </section>
+                                <section>
+                                    <div><a id="taskOverviewWebLinks"></a>
+                                        <h2>Web Links</h2>
+                                        <hr>
+                                    </div>
+                                    <div><a title="Labs on Demand Assessment Environment and DVD Database "
+                                            href="https://lrps.wgu.edu/provision/271010110">Labs on Demand Assessment
+                                            Environment and DVD Database </a>
+                                        <p></p>
+                                    </div>
+                                    <div><a title="Panopto Access"
+                                            href="https://wgu.hosted.panopto.com/Panopto/Pages/Home.aspx">Panopto
+                                            Access</a>
+                                        <p>Sign in using the "WGU" option. If prompted, log in with your WGU student
+                                            portal
+                                            credentials, which should forward you to Panopto's website. If you have any
+                                            problems accessing Panopto, please contact Assessment Services at
+                                            assessmentservices@wgu.edu. It may take up to two business days to receive
+                                            your
+                                            WGU Panopto recording permissions once you have begun the course. </p>
+                                    </div>
+                                    <div><a title="Panopto How-To Videos"
+                                            href="https://wgu.hosted.panopto.com/Panopto/Pages/Sessions/List.aspx#folderID=&quot;291182f0-cb6a-466a-929c-2cbac05f0109&quot;">Panopto
+                                            How-To Videos</a>
+                                        <p></p>
+                                    </div>
+                                    <div><a title="Skillable Labs Knowledge Base Article"
+                                            href="https://cm.wgu.edu/t5/Frequently-Asked-Questions/Skillable-Labs/ta-p/44302">Skillable
+                                            Labs Knowledge Base Article</a>
+                                        <p>Please consult this WGU Knowledge Base article for general FAQs regarding
+                                            your
+                                            Skillable lab environment.</p>
+                                    </div><!---->
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </app-task-overview>
+                <div><app-dev-preview-data><!----></app-dev-preview-data></div>
+            </div><!---->
+        </app-task-overview-page><!----></main>
+</body>
+
+</html>

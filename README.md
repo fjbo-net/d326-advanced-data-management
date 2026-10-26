@@ -585,3 +585,31 @@ To verify the definition, provision the database with [`.\scripts\setup-db.bat`]
 ``` batch
 psql -U postgres -d dvdrental -c "\d report_detailed"
 ```
+
+#### Verification
+
+The table is verified against the design above by [`./scripts/sql/tests/test-detailed-table.sql`](./scripts/sql/tests/test-detailed-table.sql). The script leaves the database unchanged: the parts that write to `report_detailed` run inside a transaction that ends with `ROLLBACK`, which also restores any rows the table already held. It has four parts:
+
+| Part | What it checks |
+|------|----------------|
+| 1. Structure | Every field exists with the documented name, data type, length and nullability; the table has exactly the 10 documented fields; `return_date` is the only nullable field; every field has a `COMMENT`. |
+| 2. Constraints | The primary key `pk_report_detailed` covers `rental_id` alone, the check constraint `ck_report_detailed_rental_status` limits `rental_status` to `Returned` and `Outstanding`, and there are no foreign keys. |
+| 3. Behaviour | Valid rows (returned, outstanding with `NULL` `return_date`, maximum-length values) are accepted. Invalid rows are rejected with the expected error: duplicate `rental_id`, `NULL` in each required field, unknown `rental_status`, and values longer than the field. |
+| 4. Compatibility | One row per rental is inserted through the full [JOIN path](#full-join-path) of the source tables, with `fn_rental_status` and `fn_customer_name` in the `SELECT` list. The row count must equal the number of rentals, and the stored status and customer name must agree with the source data. A sample of 10 rows is shown. |
+
+To run the tests:
+
+1. Provision the functions and the table with [`.\scripts\setup-db.bat`](#database-provisioning). The test script expects them to exist already.
+0. From the root of the repository, run the test script:
+
+	``` batch
+	psql -U postgres -d dvdrental -P pager=off -f .\scripts\sql\tests\test-detailed-table.sql
+	```
+
+	- To keep a copy of the results send the output to a file with `-o`:
+
+		``` batch
+		psql -U postgres -d dvdrental -P pager=off -f .\scripts\sql\tests\test-detailed-table.sql -o .\data-analysis\evidence\test-detailed-table-results.txt
+		```
+
+0. Review the output: every check reports `PASS` or `FAIL` in its `result` column. All of them should report `PASS`.

@@ -211,7 +211,7 @@ psql -U postgres -d dvdrental -f script.sql
 ```
 
 ### Database Provisioning
-The database objects the report depends on (currently the data transformation functions and the detailed table) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
+The database objects the report depends on (currently the data transformation functions, the detailed table and the summary table) are provisioned by `scripts\setup-db.bat`. It runs the SQL scripts in `scripts/sql` against the `dvdrental` database as the `postgres` user and stops with an error if any of them fails.
 
 To provision the database:
 ``` batch

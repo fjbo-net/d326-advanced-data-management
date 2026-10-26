@@ -362,38 +362,7 @@ This field should be transformed with a user-defined function for three reasons:
 
 The schema stores a person's name across two columns, which is correct for storage and wrong for a report: it costs the reader two columns of width and asks them to assemble the name themselves. The function combines both parts into a single field and normalizes capitalization, so the output reads the same way regardless of how a record was keyed in at the counter. A user-defined function is the right place for this because the rule — which part comes first, how the parts are separated, how casing is normalized — is a presentation decision that should be stated once and reused, not repeated inside every query that happens to need a name.
 
-#### Implementation
-
-Both functions are created by [`scripts/sql/create-transform-function.sql`](scripts/sql/create-transform-function.sql), which is run for you by [`scripts\setup-db.bat`](#database-provisioning). The script uses `CREATE OR REPLACE FUNCTION`, so running it again updates the definitions instead of failing.
-
-Each function is `IMMUTABLE`: given the same input it always returns the same output and reads nothing from the database, so PostgreSQL can pre-evaluate calls with constant arguments and the functions can be used in an index. Both are written in `LANGUAGE sql` with a plain `SELECT` body, which PostgreSQL can inline into the calling query.
-
-| Call | Result | Behaviour shown |
-|------|--------|-----------------|
-| `fn_rental_status(NULL)` | `Outstanding` | No return recorded, so the copy is still out. |
-| `fn_rental_status('2005-05-26 22:04:30')` | `Returned` | Any timestamp means the copy came back. |
-| `fn_customer_name('MARY', 'SMITH')` | `Mary Smith` | Both parts are combined and the capitalization normalized. |
-| `fn_customer_name('  mary ', NULL)` | `Mary` | Surrounding whitespace is trimmed and a missing part is left out. |
-| `fn_customer_name(NULL, 'SMITH')` | `Smith` | A missing first name leaves no dangling separator. |
-| `fn_customer_name('', NULL)` | `NULL` | When there is no name at all the result is `NULL` instead of an empty string. |
-
-`fn_rental_status` is deliberately **not** declared `STRICT`. A strict function returns `NULL` without running whenever any argument is `NULL`, and `NULL` is exactly the input that has to produce `Outstanding`.
-
-The functions are called from the `SELECT` list of the detailed table:
-
-``` sql
-SELECT
-    r.rental_id,
-    r.rental_date,
-    fn_rental_status(r.return_date) AS rental_status,
-    fn_customer_name(c.first_name, c.last_name) AS customer_name
-
-FROM rental AS r
-    INNER JOIN customer AS c
-        ON c.customer_id = r.customer_id
-
-LIMIT 10;
-```
+The functions that perform both transformations are described in [Transformation Functions](#transformation-functions).
 
 #### Business Use of the Detailed Table
 
@@ -506,3 +475,78 @@ The summary table is the section a decision is made from. It compresses every re
 - **It makes the report monitorable over time.** Because the table is small and refreshed from the same detail, the same figures can be compared between refreshes. A category changing rank in a city, or a city's total falling, is visible at a glance in a way it never would be in sixteen thousand rental records.
 
 Read together, the two sections divide the work: the summary table says *what to do and where*, and the detailed table says *with which titles, for which customers, and at which branch*.
+
+
+## Transformation Functions
+
+The user-defined functions that perform the transformations identified in [Field Transformation](#field-transformation).
+
+### Implementation
+
+Both functions are created by [`./scripts/sql/create-transform-function.sql`](./scripts/sql/create-transform-function.sql), which is executed as part of the [database provisioning](#database-provisioning) performed by `.\scripts\setup-db.bat`. The script uses `CREATE OR REPLACE FUNCTION`, so running it again updates the definitions instead of failing.
+
+Each function is `IMMUTABLE`: given the same input it always returns the same output and reads nothing from the database, so PostgreSQL can pre-evaluate calls with constant arguments and the functions can be used in an index. Both are written in `LANGUAGE sql` with a plain `SELECT` body, which PostgreSQL can inline into the calling query.
+
+| Call | Result | Behaviour shown |
+|------|--------|-----------------|
+| `fn_rental_status(NULL)` | `Outstanding` | No return recorded, so the copy is still out. |
+| `fn_rental_status('2005-05-26 22:04:30')` | `Returned` | Any timestamp means the copy came back. |
+| `fn_customer_name('MARY', 'SMITH')` | `Mary Smith` | Both parts are combined and the capitalization normalized. |
+| `fn_customer_name('  mary ', NULL)` | `Mary` | Surrounding whitespace is trimmed and a missing part is left out. |
+| `fn_customer_name(NULL, 'SMITH')` | `Smith` | A missing first name leaves no dangling separator. |
+| `fn_customer_name('', NULL)` | `NULL` | When there is no name at all the result is `NULL` instead of an empty string. |
+
+`fn_rental_status` is deliberately **not** declared `STRICT`. A strict function returns `NULL` without running whenever any argument is `NULL`, and `NULL` is exactly the input that has to produce `Outstanding`.
+
+The functions are called from the `SELECT` list of the detailed table:
+
+``` sql
+SELECT
+    r.rental_id,
+    r.rental_date,
+    fn_rental_status(r.return_date) AS rental_status,
+    fn_customer_name(c.first_name, c.last_name) AS customer_name
+
+FROM rental AS r
+    INNER JOIN customer AS c
+        ON c.customer_id = r.customer_id
+
+LIMIT 10;
+```
+
+### Verification
+
+The functions are verified to produce the expected transformations by [`./scripts/sql/tests/test-data-transform-function.sql`](./scripts/sql/tests/test-data-transform-function.sql). The script is read-only, so it can be run as many times as needed without changing the database. It has four parts:
+
+| Part | What it checks |
+|------|----------------|
+| 1. Unit tests | Each function is called with literal inputs (valid data, `NULL` values, blank and whitespace-only strings, punctuation, multi-word and accented names) and the output is compared with the expected value. |
+| 2. Data tests | Both functions are applied to every row of the `rental` and `customer` tables, checking that each row produces a valid result. |
+| 3. Detailed table | The functions are called from the `SELECT` list and the `WHERE` clause of a query that joins `rental` and `customer`, as the detailed table does. A sample of 10 rows shows the raw columns next to the transformed ones. |
+| 4. Performance | `EXPLAIN ANALYZE` of both functions over the whole `rental` and `customer` tables. |
+
+To run the tests:
+
+1. Provision the functions with [`.\scripts\setup-db.bat`](#database-provisioning). The test script expects them to exist already.
+0. From the root of the repository, run the test script:
+
+	``` batch
+	SET PGCLIENTENCODING=UTF8
+	psql -U postgres -d dvdrental -P pager=off -f .\scripts\sql\tests\test-data-transform-function.sql
+	```
+
+	- `PGCLIENTENCODING=UTF8` tells `psql` that the script is saved as UTF-8. Without it, `psql` on Windows reads the script using the console's code page, garbles the accented names of the unit tests and reports a false `FAIL`. `-P pager=off` prints the whole output at once instead of pausing after every screen.
+
+	- To keep a copy of the results send the output to a file with `-o`:
+
+		``` batch
+		psql -U postgres -d dvdrental -P pager=off -f .\scripts\sql\tests\test-data-transform-function.sql -o .\data-analysis\evidence\test-data-transform-function-results.txt
+		```
+
+0. Review the output:
+	- Every unit, data and query test reports `PASS` or `FAIL` in its `result` column. All of them should report `PASS`.
+	- The detailed table sample shows `Outstanding` next to every empty `return_date` and the full customer name next to `first_name` and `last_name`.
+	- The `Execution Time` line at the end of each `EXPLAIN ANALYZE` plan should be well under a second.
+
+
+The script was executed in the Labs on Demand Assessment Environment against the DVD Rental database, and every test reported `PASS`. Both functions therefore produce the expected transformations for literal inputs, for every row of the dataset, and when called from the query that populates the detailed table.

@@ -4,6 +4,33 @@ Project for the Performance Assessment for the course D326 Advanced Data Managem
 
 ## Getting Started
 
+### Project Topology
+
+High-level overview of the project file structure. Please note that only key or relevant files are listed below. Not all files are listed.
+
+- **d326-advanced-data-management/**
+
+	- [data-analysis/](./data-analysis/)
+
+		Contains deliverables and resources for Task 1.
+
+		- `task-1-overview.md`
+
+			Markdown version of the Task 1 Overview.
+
+	- [scripts/](/scripts/)
+
+		Contains tools and scripts for development and aid on the project.
+
+		- [dev/](./scripts/dev/)
+
+			Contains development scripts. See [Developer Set Up](#developer-set-up) for more details.
+
+	- `README.md`
+
+		This file. Contains information about the project. 
+
+
 ### Set Up
 
 Use the following steps to configure the pre-requisites for the project:

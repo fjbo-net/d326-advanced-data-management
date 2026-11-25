@@ -626,8 +626,10 @@ The summary table is created by [`./scripts/sql/create-summary-table.sql`](./scr
 
 | Field | Data Type | Nullable |
 |-------|-----------|----------|
-| `city` | `character varying(50)` | No (primary key) |
-| `category_name` | `character varying(25)` | No (primary key) |
+| `city_id` | `integer` | No (primary key) |
+| `city` | `character varying(50)` | No |
+| `category_id` | `integer` | No (primary key) |
+| `category_name` | `character varying(25)` | No |
 | `rental_count` | `integer` | No |
 | `category_rank` | `integer` | No |
 | `city_rental_total` | `integer` | No |
@@ -638,7 +640,7 @@ The summary table is created by [`./scripts/sql/create-summary-table.sql`](./scr
 
 - The data types are those documented under [Summary Table](#summary-table).
 - Every field is `NOT NULL`.
-- The primary key is the grain `(city, category_name)`, so each city and category appears in the table once.
+- The primary key is the grain `(city_id, category_id)`, so each city and category appears in the table once, and two cities that share a name keep separate rows.
 - Check constraints enforce the domains of the data dictionary: `rental_count >= 1`, `category_rank >= 1`, `city_rental_total >= rental_count`, `share_of_city_rentals BETWEEN 0 AND 100`, `distinct_customers BETWEEN 1 AND rental_count` and `outstanding_rentals BETWEEN 0 AND rental_count`.
 - There are no foreign keys to the source tables, since the report table is a denormalized snapshot of them.
 - Every table and column carries a `COMMENT` describing its business purpose, visible with `\d+ report_summary`.

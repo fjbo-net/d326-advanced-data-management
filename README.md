@@ -311,7 +311,7 @@ The detailed table is the most granular section of the report: **one row per ren
 | 2 | `rental_date` | `timestamp without time zone` | `rental.rental_date` | The moment the rental occurred. Allows the report to be filtered or trended over a period, so a category's popularity can be evaluated for a specific season, quarter or year rather than over the whole history. |
 | 3 | `return_date` | `timestamp without time zone` (nullable) | `rental.return_date` | The moment the copy was returned. `NULL` when the copy has not come back yet. Source value for the transformed `rental_status` field. |
 | 4 | `rental_status` | `character varying(20)` — **transformed** | Derived from `rental.return_date` | Human-readable completion state of the rental (`Returned` / `Outstanding`). Replaces a `NULL` timestamp, which is meaningless to a nontechnical reader, with an explicit business label. See [Field Transformation](#field-transformation). |
-| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the field the summary table groups by. |
+| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the name shown for each city the summary table groups by. |
 | 6 | `category_name` | `character varying(25)` | `category.name` | The category dimension of the business question (e.g. Action, Comedy, Sports). This is the value being counted and ranked per city in the summary table. |
 | 7 | `film_title` | `character varying(255)` | `film.title` | The specific film that was rented. Lets an analyst see *which* titles are driving a category's popularity in a city, which is the level of detail needed to make a stocking decision. |
 | 8 | `customer_id` | `smallint` | `rental.customer_id` | Identifies the customer behind each rental. Supports per-customer drill-down and makes it possible to tell a category driven by many customers from one driven by a single heavy renter. |
@@ -386,12 +386,14 @@ Grouping is performed on `city.city_id` and `category.category_id`, with the nam
 
 #### Grouping Dimension Fields
 
-The fields the report aggregates **by**. Together they define the grain of the table — one row per pair.
+The fields the report aggregates **by**. The pair (`city_id`, `category_id`) defines the grain of the table — one row per pair — and `city` and `category_name` are the labels a reader recognizes each pair by. The identifiers are necessary because city names are not unique: the `city` table holds two cities named `London`, one in the United Kingdom and one in Canada, and a grain defined by name would merge them into one market.
 
 | # | Field | Data Type | Nullable | Source | Business Purpose |
 |---|-------|-----------|----------|--------|------------------|
-| 1 | `city` | `character varying(50)` | `NOT NULL` | `city.city` | The geographic dimension of the business question — the "in each city" half. Each city is a market the business serves, and inventory decisions are made market by market, so this is the level the report is grouped at. |
-| 2 | `category_name` | `character varying(25)` | `NOT NULL` | `category.name` | The category dimension of the business question — the "which film category" half. One of the sixteen categories in the catalog (Action, Comedy, Sports, ...), and the value being ranked within each city. |
+| 1 | `city_id` | `integer` | `NOT NULL` | `city.city_id` | The geographic dimension of the business question — the "in each city" half. Each city is a market the business serves, and inventory decisions are made market by market, so this is the level the report is grouped at. Keeps the figures of two cities that share a name apart. |
+| 2 | `city` | `character varying(50)` | `NOT NULL` | `city.city` | The name of the city, shown so that a stakeholder reads a place instead of a number. |
+| 3 | `category_id` | `integer` | `NOT NULL` | `category.category_id` | The category dimension of the business question — the "which film category" half. Identifies the catalog record being counted and ranked within each city. |
+| 4 | `category_name` | `character varying(25)` | `NOT NULL` | `category.name` | The name of the category, one of the sixteen in the catalog (Action, Comedy, Sports, ...). This is the word a stakeholder reads as the answer to the business question. |
 
 #### Aggregated Measure Fields
 
@@ -399,13 +401,13 @@ The fields the report aggregates. Each is computed over the detailed-table rows 
 
 | # | Field | Data Type | Nullable | Derivation | Business Purpose |
 |---|-------|-----------|----------|------------|------------------|
-| 3 | `rental_count` | `integer` | `NOT NULL` | `COUNT(rental_id)` per city and category | **The measure that answers the business question.** The number of rental events recorded for the category in the city. "Most rentals" is this field at its maximum within a city. |
-| 4 | `category_rank` | `integer` | `NOT NULL` | `DENSE_RANK()` over `rental_count` descending, partitioned by city | The category's position within its city, `1` being the most rented. States the answer outright instead of asking the reader to sort a table and compare numbers, and makes the report filterable down to one row per city. A tie leaves two categories sharing rank `1`, which is itself a finding. |
-| 5 | `city_rental_total` | `integer` | `NOT NULL` | `SUM(rental_count)` partitioned by city | Total rentals recorded in the city across all categories. Sizes the market behind the ranking, so a leading category in a city with a handful of rentals is not acted on as though it were a leading category in a busy one. |
-| 6 | `share_of_city_rentals` | `numeric(5,2)` | `NOT NULL` | `rental_count` as a percentage of `city_rental_total` | How much of the city's rental activity the category accounts for, from `0.00` to `100.00`. Separates a decisive lead from a near tie: 40% of a city's rentals is a stocking mandate, while 9% against a second place of 8% is noise. |
-| 7 | `distinct_customers` | `integer` | `NOT NULL` | `COUNT(DISTINCT customer_id)` per city and category | How many different customers produced those rentals. Distinguishes broad local appetite for a category from a few heavy renters, which call for opposite responses — more copies in the first case, a loyalty or recommendation play in the second. |
-| 8 | `outstanding_rentals` | `integer` | `NOT NULL` | Count of rows whose `rental_status` is `Outstanding` | How many of the category's copies are off the shelf and not yet returned. Read next to `rental_count`, it shows a popular category whose demand is being throttled by unavailable stock — a signal to reorder rather than merely restock. |
-| 9 | `latest_rental_date` | `date` | `NOT NULL` | `MAX(rental_date)` cast to a date | The most recent rental of the category in the city. Tells the reader whether a leading position is current or historical, so a category that led a year ago and has since gone quiet is not restocked on the strength of a stale count. |
+| 5 | `rental_count` | `integer` | `NOT NULL` | `COUNT(rental_id)` per `city_id` and `category_id` | **The measure that answers the business question.** The number of rental events recorded for the category in the city. "Most rentals" is this field at its maximum within a city. |
+| 6 | `category_rank` | `integer` | `NOT NULL` | `DENSE_RANK()` over `rental_count` descending, partitioned by `city_id` | The category's position within its city, `1` being the most rented. States the answer outright instead of asking the reader to sort a table and compare numbers, and makes the report filterable down to one row per city. A tie leaves two categories sharing rank `1`, which is itself a finding. |
+| 7 | `city_rental_total` | `integer` | `NOT NULL` | `SUM(rental_count)` partitioned by `city_id` | Total rentals recorded in the city across all categories. Sizes the market behind the ranking, so a leading category in a city with a handful of rentals is not acted on as though it were a leading category in a busy one. |
+| 8 | `share_of_city_rentals` | `numeric(5,2)` | `NOT NULL` | `rental_count` as a percentage of `city_rental_total` | How much of the city's rental activity the category accounts for, from `0.00` to `100.00`. Separates a decisive lead from a near tie: 40% of a city's rentals is a stocking mandate, while 9% against a second place of 8% is noise. |
+| 9 | `distinct_customers` | `integer` | `NOT NULL` | `COUNT(DISTINCT customer_id)` per `city_id` and `category_id` | How many different customers produced those rentals. Distinguishes broad local appetite for a category from a few heavy renters, which call for opposite responses — more copies in the first case, a loyalty or recommendation play in the second. |
+| 10 | `outstanding_rentals` | `integer` | `NOT NULL` | Count of rows whose `rental_status` is `Outstanding` | How many of the category's copies are off the shelf and not yet returned. Read next to `rental_count`, it shows a popular category whose demand is being throttled by unavailable stock — a signal to reorder rather than merely restock. |
+| 11 | `latest_rental_date` | `date` | `NOT NULL` | `MAX(rental_date)` cast to a date | The most recent rental of the category in the city. Tells the reader whether a leading position is current or historical, so a category that led a year ago and has since gone quiet is not restocked on the strength of a stale count. |
 
 #### Data Types
 

@@ -7,8 +7,9 @@
 --
 --     * Every field is `NOT NULL`: a row exists only because at least
 --       one rental produced it, so every aggregate has a value.
---     * The pair (`city`, `category_name`) is the grain and the primary
---       key.
+--     * The pair (`city_id`, `category_id`) is the grain and the primary
+--       key. `city` and `category_name` are their labels: city names are
+--       not unique, so a name cannot identify a row.
 --     * Check constraints enforce the domains of values of the data
 --       dictionary.
 --     * No foreign keys point to the source tables, since the report
@@ -43,7 +44,7 @@ CREATE TABLE report_summary (
     latest_rental_date      date                    NOT NULL,
 
     CONSTRAINT pk_report_summary
-        PRIMARY KEY (city, category_name),
+        PRIMARY KEY (city_id, category_id),
 
     CONSTRAINT ck_report_summary_rental_count
         CHECK (rental_count >= 1),

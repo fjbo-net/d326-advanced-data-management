@@ -447,8 +447,10 @@ A single reference for the fields of the summary table, to be read alongside the
 
 | Field | PostgreSQL Type | Null | Role | Domain of Values | Example |
 |-------|-----------------|------|------|------------------|---------|
-| `city` | `character varying(50)` | `NOT NULL` | Dimension — part of the grain | Any city name present in `city` (600 in the sample database) | `Woodridge` |
-| `category_name` | `character varying(25)` | `NOT NULL` | Dimension — part of the grain | One of the 16 names in `category`: Action, Animation, Children, Classics, Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New, Sci-Fi, Sports, Travel | `Sports` |
+| `city_id` | `integer` | `NOT NULL` | Dimension — part of the grain | Any `city_id` present in `city` (600 in the sample database) | `576` |
+| `city` | `character varying(50)` | `NOT NULL` | Dimension — label | Any city name present in `city`; not unique, since different cities can share a name | `Woodridge` |
+| `category_id` | `integer` | `NOT NULL` | Dimension — part of the grain | Any `category_id` present in `category` (16 in the sample database) | `15` |
+| `category_name` | `character varying(25)` | `NOT NULL` | Dimension — label | One of the 16 names in `category`: Action, Animation, Children, Classics, Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New, Sci-Fi, Sports, Travel | `Sports` |
 | `rental_count` | `integer` | `NOT NULL` | Measure — primary | `1` and above; a pair with no rentals produces no row | `42` |
 | `category_rank` | `integer` | `NOT NULL` | Measure — ordinal | `1` to `16`; `1` is the most rented category in the city, and ties share a rank | `1` |
 | `city_rental_total` | `integer` | `NOT NULL` | Measure — context | `1` and above; equals the sum of `rental_count` across the city's rows | `181` |
@@ -459,8 +461,8 @@ A single reference for the fields of the summary table, to be read alongside the
 
 Notes on reading the dictionary:
 
-- **Grain.** The pair (`city`, `category_name`) identifies a row. Every other field is an aggregate measured over that pair, so no two rows of the table describe the same city and category.
-- **Role.** `Dimension` fields are the ones the report groups by and are carried straight from the source tables; `Measure` fields are produced by the aggregation and exist only in this table.
+- **Grain.** The pair (`city_id`, `category_id`) identifies a row, so no two rows of the table describe the same city and category. `city` and `category_name` are the labels of that pair, and every other field is an aggregate measured over it. Two cities that share a name appear as separate sets of rows, told apart by `city_id`.
+- **Role.** `Dimension` fields identify and label the groups of the report and are carried straight from the source tables; `Measure` fields are produced by the aggregation and exist only in this table.
 - **Derived fields.** `share_of_city_rentals`, `category_rank` and `city_rental_total` are computed from `rental_count` within the city, so they will always reconcile with it rather than being independent figures that could drift.
 - **Example values** are illustrative of the shape and the units of each field, not output of a query.
 

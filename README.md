@@ -311,7 +311,7 @@ The detailed table is the most granular section of the report: **one row per ren
 | 2 | `rental_date` | `timestamp without time zone` | `rental.rental_date` | The moment the rental occurred. Allows the report to be filtered or trended over a period, so a category's popularity can be evaluated for a specific season, quarter or year rather than over the whole history. |
 | 3 | `return_date` | `timestamp without time zone` (nullable) | `rental.return_date` | The moment the copy was returned. `NULL` when the copy has not come back yet. Source value for the transformed `rental_status` field. |
 | 4 | `rental_status` | `character varying(20)` — **transformed** | Derived from `rental.return_date` | Human-readable completion state of the rental (`Returned` / `Outstanding`). Replaces a `NULL` timestamp, which is meaningless to a nontechnical reader, with an explicit business label. See [Field Transformation](#field-transformation). |
-| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the field the summary table groups by. |
+| 5 | `city` | `character varying(50)` | `city.city` | The geographic dimension of the business question. Identifies the city of the customer who made the rental and is the name shown for each city the summary table groups by. |
 | 6 | `category_name` | `character varying(25)` | `category.name` | The category dimension of the business question (e.g. Action, Comedy, Sports). This is the value being counted and ranked per city in the summary table. |
 | 7 | `film_title` | `character varying(255)` | `film.title` | The specific film that was rented. Lets an analyst see *which* titles are driving a category's popularity in a city, which is the level of detail needed to make a stocking decision. |
 | 8 | `customer_id` | `smallint` | `rental.customer_id` | Identifies the customer behind each rental. Supports per-customer drill-down and makes it possible to tell a category driven by many customers from one driven by a single heavy renter. |
@@ -386,12 +386,14 @@ Grouping is performed on `city.city_id` and `category.category_id`, with the nam
 
 #### Grouping Dimension Fields
 
-The fields the report aggregates **by**. Together they define the grain of the table — one row per pair.
+The fields the report aggregates **by**. The pair (`city_id`, `category_id`) defines the grain of the table — one row per pair — and `city` and `category_name` are the labels a reader recognizes each pair by. The identifiers are necessary because city names are not unique: the `city` table holds two cities named `London`, one in the United Kingdom and one in Canada, and a grain defined by name would merge them into one market.
 
 | # | Field | Data Type | Nullable | Source | Business Purpose |
 |---|-------|-----------|----------|--------|------------------|
-| 1 | `city` | `character varying(50)` | `NOT NULL` | `city.city` | The geographic dimension of the business question — the "in each city" half. Each city is a market the business serves, and inventory decisions are made market by market, so this is the level the report is grouped at. |
-| 2 | `category_name` | `character varying(25)` | `NOT NULL` | `category.name` | The category dimension of the business question — the "which film category" half. One of the sixteen categories in the catalog (Action, Comedy, Sports, ...), and the value being ranked within each city. |
+| 1 | `city_id` | `integer` | `NOT NULL` | `city.city_id` | The geographic dimension of the business question — the "in each city" half. Each city is a market the business serves, and inventory decisions are made market by market, so this is the level the report is grouped at. Keeps the figures of two cities that share a name apart. |
+| 2 | `city` | `character varying(50)` | `NOT NULL` | `city.city` | The name of the city, shown so that a stakeholder reads a place instead of a number. |
+| 3 | `category_id` | `integer` | `NOT NULL` | `category.category_id` | The category dimension of the business question — the "which film category" half. Identifies the catalog record being counted and ranked within each city. |
+| 4 | `category_name` | `character varying(25)` | `NOT NULL` | `category.name` | The name of the category, one of the sixteen in the catalog (Action, Comedy, Sports, ...). This is the word a stakeholder reads as the answer to the business question. |
 
 #### Aggregated Measure Fields
 
@@ -399,21 +401,22 @@ The fields the report aggregates. Each is computed over the detailed-table rows 
 
 | # | Field | Data Type | Nullable | Derivation | Business Purpose |
 |---|-------|-----------|----------|------------|------------------|
-| 3 | `rental_count` | `integer` | `NOT NULL` | `COUNT(rental_id)` per city and category | **The measure that answers the business question.** The number of rental events recorded for the category in the city. "Most rentals" is this field at its maximum within a city. |
-| 4 | `category_rank` | `integer` | `NOT NULL` | `DENSE_RANK()` over `rental_count` descending, partitioned by city | The category's position within its city, `1` being the most rented. States the answer outright instead of asking the reader to sort a table and compare numbers, and makes the report filterable down to one row per city. A tie leaves two categories sharing rank `1`, which is itself a finding. |
-| 5 | `city_rental_total` | `integer` | `NOT NULL` | `SUM(rental_count)` partitioned by city | Total rentals recorded in the city across all categories. Sizes the market behind the ranking, so a leading category in a city with a handful of rentals is not acted on as though it were a leading category in a busy one. |
-| 6 | `share_of_city_rentals` | `numeric(5,2)` | `NOT NULL` | `rental_count` as a percentage of `city_rental_total` | How much of the city's rental activity the category accounts for, from `0.00` to `100.00`. Separates a decisive lead from a near tie: 40% of a city's rentals is a stocking mandate, while 9% against a second place of 8% is noise. |
-| 7 | `distinct_customers` | `integer` | `NOT NULL` | `COUNT(DISTINCT customer_id)` per city and category | How many different customers produced those rentals. Distinguishes broad local appetite for a category from a few heavy renters, which call for opposite responses — more copies in the first case, a loyalty or recommendation play in the second. |
-| 8 | `outstanding_rentals` | `integer` | `NOT NULL` | Count of rows whose `rental_status` is `Outstanding` | How many of the category's copies are off the shelf and not yet returned. Read next to `rental_count`, it shows a popular category whose demand is being throttled by unavailable stock — a signal to reorder rather than merely restock. |
-| 9 | `latest_rental_date` | `date` | `NOT NULL` | `MAX(rental_date)` cast to a date | The most recent rental of the category in the city. Tells the reader whether a leading position is current or historical, so a category that led a year ago and has since gone quiet is not restocked on the strength of a stale count. |
+| 5 | `rental_count` | `integer` | `NOT NULL` | `COUNT(rental_id)` per `city_id` and `category_id` | **The measure that answers the business question.** The number of rental events recorded for the category in the city. "Most rentals" is this field at its maximum within a city. |
+| 6 | `category_rank` | `integer` | `NOT NULL` | `DENSE_RANK()` over `rental_count` descending, partitioned by `city_id` | The category's position within its city, `1` being the most rented. States the answer outright instead of asking the reader to sort a table and compare numbers, and makes the report filterable down to one row per city. A tie leaves two categories sharing rank `1`, which is itself a finding. |
+| 7 | `city_rental_total` | `integer` | `NOT NULL` | `SUM(rental_count)` partitioned by `city_id` | Total rentals recorded in the city across all categories. Sizes the market behind the ranking, so a leading category in a city with a handful of rentals is not acted on as though it were a leading category in a busy one. |
+| 8 | `share_of_city_rentals` | `numeric(5,2)` | `NOT NULL` | `rental_count` as a percentage of `city_rental_total` | How much of the city's rental activity the category accounts for, from `0.00` to `100.00`. Separates a decisive lead from a near tie: 40% of a city's rentals is a stocking mandate, while 9% against a second place of 8% is noise. |
+| 9 | `distinct_customers` | `integer` | `NOT NULL` | `COUNT(DISTINCT customer_id)` per `city_id` and `category_id` | How many different customers produced those rentals. Distinguishes broad local appetite for a category from a few heavy renters, which call for opposite responses — more copies in the first case, a loyalty or recommendation play in the second. |
+| 10 | `outstanding_rentals` | `integer` | `NOT NULL` | Count of rows whose `rental_status` is `Outstanding` | How many of the category's copies are off the shelf and not yet returned. Read next to `rental_count`, it shows a popular category whose demand is being throttled by unavailable stock — a signal to reorder rather than merely restock. |
+| 11 | `latest_rental_date` | `date` | `NOT NULL` | `MAX(rental_date)` cast to a date | The most recent rental of the category in the city. Tells the reader whether a leading position is current or historical, so a category that led a year ago and has since gone quiet is not restocked on the strength of a stale count. |
 
 #### Data Types
 
-The summary table draws on five kinds of data. The two dimensions keep the native PostgreSQL types of their source columns; the seven measures do not exist in the source schema at all, so their types are chosen for the values the aggregation can actually produce.
+The summary table draws on six kinds of data. The four dimension fields keep the native PostgreSQL types of their source columns; the seven measures do not exist in the source schema at all, so their types are chosen for the values the aggregation can actually produce.
 
 | Kind of Data | Fields | PostgreSQL Type | Notes |
 |--------------|--------|-----------------|-------|
-| Descriptive text dimensions | `city`, `category_name` | `character varying(50)`, `character varying(25)` | Declared at the same lengths as `city.city` and `category.name`, so no value can be truncated on its way into the summary. Carried as names rather than as the underlying `city_id` and `category_id` keys, because the summary table is read by stakeholders who recognize `Sports`, not `15`. |
+| Numeric identifiers | `city_id`, `category_id` | `integer` | Whole numbers used as keys, never as measures. They are the surrogate keys of `city` and `category`, so each row is tied to exactly one city and one category regardless of how either is named. |
+| Descriptive text dimensions | `city`, `category_name` | `character varying(50)`, `character varying(25)` | Declared at the same lengths as `city.city` and `category.name`, so no value can be truncated on its way into the summary. Carried next to the `city_id` and `category_id` keys, because the summary table is read by stakeholders who recognize `Sports`, not `15`. |
 | Whole-number counts | `rental_count`, `city_rental_total`, `distinct_customers`, `outstanding_rentals` | `integer` | Counts of rows and of distinct customers — whole, non-negative, and never fractional, so an integer type rather than a decimal one. |
 | Ordinal position | `category_rank` | `integer` | A rank is a position, not a quantity: it is sorted and filtered (`= 1`) but never summed or averaged. Typed as an `integer` for consistency with the counters above, even though it is bounded by the sixteen categories in the catalog. |
 | Percentage measure | `share_of_city_rentals` | `numeric(5,2)` | An exact decimal share. Five total digits with two to the right of the decimal point — three digits ahead of it — which covers the full `0.00` to `100.00` range the field can hold. |
@@ -421,6 +424,7 @@ The summary table draws on five kinds of data. The two dimensions keep the nativ
 
 ##### Why These Types
 
+- **`integer` rather than `smallint` for the identifiers.** `city_id` and `category_id` take the type of the primary keys they are read from, `city.city_id` and `category.category_id`. The columns that reference those keys, `address.city_id` and `film_category.category_id`, are declared `smallint` in the source schema, but the primary key is the authority on which values an identifier can hold.
 - **`integer` rather than `bigint` for the counters.** PostgreSQL's `COUNT()` and `SUM()` return `bigint`, and `DENSE_RANK()` returns `bigint`, so each of these fields is an explicit narrowing of the aggregate's own type. It is a safe narrowing: the whole `rental` table is on the order of sixteen thousand rows, and `city_rental_total` — the largest value any of these fields can hold — is bounded by that total, four orders of magnitude below the `integer` ceiling of 2,147,483,647. A `bigint` would spend eight bytes per value to store a number that never needs more than four, in a table that stakeholders read as a grid of numbers.
 - **`integer` rather than `smallint` for `category_rank`.** A `smallint` would hold a rank of at most 16 comfortably. Keeping every counter in the table one type is worth more than the two bytes, because it means a reader never has to ask why one numeric column is declared differently from its neighbours.
 - **`numeric(5,2)` rather than `double precision` for the share.** `numeric` is exact, so the shares of a city's categories add up to the figure a reader expects instead of to a floating-point approximation of it, and a published report never shows `9.600000000000001`. The scale of `2` is set deliberately: a hundredth of a percent is finer than any stocking decision needs, and it is enough to break the visual tie between two categories that both round to the same whole percent.
@@ -432,7 +436,7 @@ The summary table draws on five kinds of data. The two dimensions keep the nativ
 **Every field of the summary table is `NOT NULL`**, and this is a property of how the table is built rather than a constraint imposed on top of it:
 
 - A row exists only because at least one rental produced it, so every aggregate has at least one value to compute from. There are no empty groups to return a `NULL` count or a `NULL` maximum.
-- The source columns behind the fields — `city.city`, `category.name`, `rental.rental_id`, `rental.customer_id` and `rental.rental_date` — are all `NOT NULL` in the DVD Rental schema, so nothing nullable enters the aggregation in the first place.
+- The source columns behind the fields — `city.city_id`, `city.city`, `category.category_id`, `category.name`, `rental.rental_id`, `rental.customer_id` and `rental.rental_date` — are all `NOT NULL` in the DVD Rental schema, so nothing nullable enters the aggregation in the first place.
 - `rental.return_date`, the one nullable column the report touches, never reaches the summary table as a date. It is absorbed into `outstanding_rentals`, where a missing return is counted as a `1` instead of being displayed as a blank. The transformation described in [Field Transformation](#field-transformation) is what makes that possible, and it is the reason the summary table can promise a reader that no cell in it is ever empty.
 
 A city and category pair with no rentals produces **no row**, rather than a row of zeros. The summary table reports observed demand, and a missing pair means no rental of that category was recorded in that city — which may mean there was no appetite for it or that no copies were ever stocked there. The summary table cannot tell those two apart; `store_id` in the detailed table is where that question is settled.
@@ -443,8 +447,10 @@ A single reference for the fields of the summary table, to be read alongside the
 
 | Field | PostgreSQL Type | Null | Role | Domain of Values | Example |
 |-------|-----------------|------|------|------------------|---------|
-| `city` | `character varying(50)` | `NOT NULL` | Dimension — part of the grain | Any city name present in `city` (600 in the sample database) | `Woodridge` |
-| `category_name` | `character varying(25)` | `NOT NULL` | Dimension — part of the grain | One of the 16 names in `category`: Action, Animation, Children, Classics, Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New, Sci-Fi, Sports, Travel | `Sports` |
+| `city_id` | `integer` | `NOT NULL` | Dimension — part of the grain | Any `city_id` present in `city` (600 in the sample database) | `576` |
+| `city` | `character varying(50)` | `NOT NULL` | Dimension — label | Any city name present in `city`; not unique, since different cities can share a name | `Woodridge` |
+| `category_id` | `integer` | `NOT NULL` | Dimension — part of the grain | Any `category_id` present in `category` (16 in the sample database) | `15` |
+| `category_name` | `character varying(25)` | `NOT NULL` | Dimension — label | One of the 16 names in `category`: Action, Animation, Children, Classics, Comedy, Documentary, Drama, Family, Foreign, Games, Horror, Music, New, Sci-Fi, Sports, Travel | `Sports` |
 | `rental_count` | `integer` | `NOT NULL` | Measure — primary | `1` and above; a pair with no rentals produces no row | `42` |
 | `category_rank` | `integer` | `NOT NULL` | Measure — ordinal | `1` to `16`; `1` is the most rented category in the city, and ties share a rank | `1` |
 | `city_rental_total` | `integer` | `NOT NULL` | Measure — context | `1` and above; equals the sum of `rental_count` across the city's rows | `181` |
@@ -455,8 +461,8 @@ A single reference for the fields of the summary table, to be read alongside the
 
 Notes on reading the dictionary:
 
-- **Grain.** The pair (`city`, `category_name`) identifies a row. Every other field is an aggregate measured over that pair, so no two rows of the table describe the same city and category.
-- **Role.** `Dimension` fields are the ones the report groups by and are carried straight from the source tables; `Measure` fields are produced by the aggregation and exist only in this table.
+- **Grain.** The pair (`city_id`, `category_id`) identifies a row, so no two rows of the table describe the same city and category. `city` and `category_name` are the labels of that pair, and every other field is an aggregate measured over it. Two cities that share a name appear as separate sets of rows, told apart by `city_id`.
+- **Role.** `Dimension` fields identify and label the groups of the report and are carried straight from the source tables; `Measure` fields are produced by the aggregation and exist only in this table.
 - **Derived fields.** `share_of_city_rentals`, `category_rank` and `city_rental_total` are computed from `rental_count` within the city, so they will always reconcile with it rather than being independent figures that could drift.
 - **Example values** are illustrative of the shape and the units of each field, not output of a query.
 
@@ -620,8 +626,10 @@ The summary table is created by [`./scripts/sql/create-summary-table.sql`](./scr
 
 | Field | Data Type | Nullable |
 |-------|-----------|----------|
-| `city` | `character varying(50)` | No (primary key) |
-| `category_name` | `character varying(25)` | No (primary key) |
+| `city_id` | `integer` | No (primary key) |
+| `city` | `character varying(50)` | No |
+| `category_id` | `integer` | No (primary key) |
+| `category_name` | `character varying(25)` | No |
 | `rental_count` | `integer` | No |
 | `category_rank` | `integer` | No |
 | `city_rental_total` | `integer` | No |
@@ -632,7 +640,7 @@ The summary table is created by [`./scripts/sql/create-summary-table.sql`](./scr
 
 - The data types are those documented under [Summary Table](#summary-table).
 - Every field is `NOT NULL`.
-- The primary key is the grain `(city, category_name)`, so each city and category appears in the table once.
+- The primary key is the grain `(city_id, category_id)`, so each city and category appears in the table once, and two cities that share a name keep separate rows.
 - Check constraints enforce the domains of the data dictionary: `rental_count >= 1`, `category_rank >= 1`, `city_rental_total >= rental_count`, `share_of_city_rentals BETWEEN 0 AND 100`, `distinct_customers BETWEEN 1 AND rental_count` and `outstanding_rentals BETWEEN 0 AND rental_count`.
 - There are no foreign keys to the source tables, since the report table is a denormalized snapshot of them.
 - Every table and column carries a `COMMENT` describing its business purpose, visible with `\d+ report_summary`.

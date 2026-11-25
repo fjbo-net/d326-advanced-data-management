@@ -7,8 +7,9 @@
 --
 --     * Every field is `NOT NULL`: a row exists only because at least
 --       one rental produced it, so every aggregate has a value.
---     * The pair (`city`, `category_name`) is the grain and the primary
---       key.
+--     * The pair (`city_id`, `category_id`) is the grain and the primary
+--       key. `city` and `category_name` are their labels: city names are
+--       not unique, so a name cannot identify a row.
 --     * Check constraints enforce the domains of values of the data
 --       dictionary.
 --     * No foreign keys point to the source tables, since the report
@@ -30,7 +31,9 @@ BEGIN;
 DROP TABLE IF EXISTS report_summary;
 
 CREATE TABLE report_summary (
+    city_id                 integer                 NOT NULL,
     city                    character varying(50)   NOT NULL,
+    category_id             integer                 NOT NULL,
     category_name           character varying(25)   NOT NULL,
     rental_count            integer                 NOT NULL,
     category_rank           integer                 NOT NULL,
@@ -41,7 +44,7 @@ CREATE TABLE report_summary (
     latest_rental_date      date                    NOT NULL,
 
     CONSTRAINT pk_report_summary
-        PRIMARY KEY (city, category_name),
+        PRIMARY KEY (city_id, category_id),
 
     CONSTRAINT ck_report_summary_rental_count
         CHECK (rental_count >= 1),
@@ -66,8 +69,14 @@ CREATE TABLE report_summary (
 COMMENT ON TABLE report_summary IS
     'Summary section of the rental report: one row per city and film category.';
 
+COMMENT ON COLUMN report_summary.city_id IS
+    'Identifier of the city; part of the grain, since different cities can share a name.';
+
 COMMENT ON COLUMN report_summary.city IS
     'City the rentals were made in; the geographic dimension of the report.';
+
+COMMENT ON COLUMN report_summary.category_id IS
+    'Identifier of the film category; part of the grain together with the city.';
 
 COMMENT ON COLUMN report_summary.category_name IS
     'Film category being counted and ranked within the city.';

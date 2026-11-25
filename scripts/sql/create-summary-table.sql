@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS report_summary;
 CREATE TABLE report_summary (
     city_id                 integer                 NOT NULL,
     city                    character varying(50)   NOT NULL,
+    category_id             integer                 NOT NULL,
     category_name           character varying(25)   NOT NULL,
     rental_count            integer                 NOT NULL,
     category_rank           integer                 NOT NULL,
@@ -72,6 +73,9 @@ COMMENT ON COLUMN report_summary.city_id IS
 
 COMMENT ON COLUMN report_summary.city IS
     'City the rentals were made in; the geographic dimension of the report.';
+
+COMMENT ON COLUMN report_summary.category_id IS
+    'Identifier of the film category; part of the grain together with the city.';
 
 COMMENT ON COLUMN report_summary.category_name IS
     'Film category being counted and ranked within the city.';
